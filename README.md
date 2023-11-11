@@ -1,2 +1,2 @@
-# Busca_geral_grafos
-Implementação da busca geral em grafos
+# Busca_largura_grafos
+Implementação da busca em largura em grafos
