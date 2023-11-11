@@ -43,7 +43,9 @@ def gerar_imagem_do_grafo(matriz_adjacencia, caminho_imagem):
     for i in range(len(matriz_adjacencia)):
         for j in range(len(matriz_adjacencia[i])):
             if matriz_adjacencia[i][j] == 1:
-                arestas.append((i, j))
+                # Ajuste para iniciar a contagem dos vértices do 1
+                arestas.append((i + 1, j + 1))
+
 
     G.add_edges_from(arestas)
 
