@@ -1,41 +1,10 @@
 import PySimpleGUI as sg
 
-
-#! Caixa para selecionar a matriz
-def criar_caixa_selecao(numero):
-    layout = [
-        [sg.Text('Escolha um valor:')],
-        [sg.Combo(list(range(1, numero + 1)), key='combo')],
-        [sg.Button('OK')]
-    ]
-
-    window = sg.Window('Interface com PySimpleGUI', layout)
-
-    while True:
-        event, values = window.read()
-
-        if event == sg.WINDOW_CLOSED:
-            break
-        elif event == 'OK':
-            valor_selecionado = values['combo']
-            break
-
-    window.close()
-    return valor_selecionado
-
-# Exemplo: chama a função com o número 10
-valor_selecionado = criar_caixa_selecao(10)
-
-if valor_selecionado:
-    print(f"Valor selecionado: {valor_selecionado}")
-else:
-    print("Nenhum valor selecionado ou janela fechada.")
-
 #! Gera o grafo e o salva como imagem
 import networkx as nx
 import matplotlib.pyplot as plt
 
-def gerar_imagem_do_grafo(matriz_adjacencia, caminho_imagem):
+def gerar_imagem_do_grafo(matriz_adjacencia, caminho_imagem, aresta_pintada=None):
     G = nx.Graph()
 
     # Converta a matriz de adjacência em uma lista de arestas
@@ -46,7 +15,6 @@ def gerar_imagem_do_grafo(matriz_adjacencia, caminho_imagem):
                 # Ajuste para iniciar a contagem dos vértices do 1
                 arestas.append((i + 1, j + 1))
 
-
     G.add_edges_from(arestas)
 
     # Use o algoritmo 'kamada_kawai_layout' para o layout
@@ -55,7 +23,13 @@ def gerar_imagem_do_grafo(matriz_adjacencia, caminho_imagem):
     fig, ax = plt.subplots()
 
     # Desenhe as arestas com diferentes espessuras e transparências
-    nx.draw_networkx_edges(G, pos, ax=ax, width=1.0, alpha=0.5, edge_color='k')
+    if aresta_pintada and aresta_pintada in G.edges():
+        # Se uma aresta específica for definida, pinte essa aresta de vermelho
+        nx.draw_networkx_edges(G, pos, ax=ax, edgelist=[aresta_pintada], width=2.0, edge_color='red')
+        nx.draw_networkx_edges(G, pos, ax=ax, edgelist=[edge for edge in G.edges() if edge != aresta_pintada],
+                               width=1.0, alpha=0.5, edge_color='k')
+    else:
+        nx.draw_networkx_edges(G, pos, ax=ax, width=1.0, alpha=0.5, edge_color='k')
 
     # Desenhe os nós, rótulos e salve a imagem
     nx.draw_networkx_nodes(G, pos, ax=ax, node_size=700, node_color="skyblue")
@@ -79,8 +53,11 @@ matriz_adjacencia_exemplo = [
 ]
 
 caminho_imagem_saida = "grafo/grafo.png"
-gerar_imagem_do_grafo(matriz_adjacencia_exemplo, caminho_imagem_saida)
+aresta_escolhida = (1, 3)  # Define a aresta a ser pintada
+
+gerar_imagem_do_grafo(matriz_adjacencia_exemplo, caminho_imagem_saida, aresta_escolhida)
 print(f"Imagem do grafo gerada em: {caminho_imagem_saida}")
+
     
 #! Exibir e mostrar opções doq fazer com o grafo
 def main():
@@ -92,7 +69,9 @@ def main():
         [sg.Image(key="-IMAGE-")],
         [sg.Push(),sg.Button('Verificar se é conexo', button_color=('white', 'DarkGreen')),sg.Push()],
         [sg.Push(),sg.Button('Fazer busca em largura', button_color=('white', 'DarkGreen')),sg.Push()],
-        [sg.Push(),sg.Button('Mostrar bipartição do grafo', button_color=('white', 'DarkGreen')),sg.Push()]
+        [sg.Push(),sg.Button('Mostrar bipartição do grafo', button_color=('white', 'DarkGreen')),sg.Push()],
+        [sg.Push(),sg.Button('Escolher outro grafo', button_color=('white', 'DarkGreen')),sg.Push()],
+        [sg.Push(),sg.Button('Sair', button_color=('white', 'DarkGreen')),sg.Push()]
     ]
 
     # Criar a janela

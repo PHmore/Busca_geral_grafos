@@ -1,8 +1,4 @@
-#Aqui teremos a leitura do arquivo de grafos e será separado em diferentes matrizes
-
-# 2.1 – O arquivo “grafo.txt” pode conter várias matrizes de adjacências, de vários grafos, separadas
-# por uma linha em branco. Dessa forma, logo depois de ler o arquivo o programa deve informar
-# quantas matrizes foram carregadas e qual delas o usuário deseja manipular #
+import PySimpleGUI as sg
 
 def ler_matrizes_arquivo(caminho_arquivo):
     matrizes = []
@@ -26,31 +22,45 @@ def ler_matrizes_arquivo(caminho_arquivo):
 
     return matrizes
 
-# Exemplo de uso
+# Leitura das matrizes
 caminho_do_arquivo = 'grafo/grafo.txt'
 matrizes = ler_matrizes_arquivo(caminho_do_arquivo)
 
-# Imprime as matrizes
-for i, matriz in enumerate(matrizes, start=1):
-    print(f"Matriz {i}:")
-    for linha in matriz:
-        print(linha)
-    print()
+# Criando o layout para a exibição das matrizes
+texto_matrizes = '\n\n'.join(['\n'.join([' '.join(map(str, linha)) for linha in matriz]) for matriz in matrizes])
+layout = [
+    [sg.Multiline(default_text=texto_matrizes, size=(40, 20), autoscroll=True, key='-TEXTBOX-')],
+    [sg.Text('Escolha uma matriz:'), sg.Combo(list(range(0, len(matrizes))), key='-COMBO-')],
+    [sg.Button('OK')]
+]
 
-grafoNum = input(f"Selecione um grafo de 1 a {len(matrizes)}: ")
+# Criando a janela
+window = sg.Window('Seleção de Matriz', layout)
 
-# Acesse a matriz 2 (índice 1 na lista)
-grafoNum = matrizes[int(grafoNum) - 1]
+while True:
+    event, values = window.read()
 
-grafoEsc = []
+    if event == sg.WINDOW_CLOSED:
+        break
 
-# Imprima a matriz 2
-print("Matriz 2:")
-for linha in grafoNum:
-    grafoEsc.append(linha)
-    print(linha)
+    if event == 'OK':
+        matriz_selecionada = matrizes[values['-COMBO-']]
+        break
 
-print("Matriz escolhida:")
-for linha in grafoEsc:
-    print(linha)
+window.close()
 
+print(matriz_selecionada)
+
+"""
+Talvez já se deva criar a imagem do grafo nesse arquivo
+
+Para facilitar retornar como 
+
+grafo_exemplo = {
+    'A': ['B', 'C'],
+    'B': ['A', 'C'],
+    'C': ['A', 'B', 'D'],
+    'D': ['C']
+}
+
+"""
