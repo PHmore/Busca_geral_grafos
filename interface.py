@@ -17,37 +17,57 @@ def gerar_imagem_do_grafo(matriz_adjacencia, caminho_imagem, aresta_pintada=None
 
     G.add_edges_from(arestas)
 
-    # Use o algoritmo 'kamada_kawai_layout' para o layout
-    pos = nx.kamada_kawai_layout(G)
+    # Separa o grafo em componentes conectadas
+    componentes = list(nx.connected_components(G))
 
     fig, ax = plt.subplots()
 
-    # Desenhe as arestas com diferentes espessuras e transparências
-    if aresta_pintada and aresta_pintada in G.edges():
-        # Se uma aresta específica for definida, pinte essa aresta de vermelho
-        nx.draw_networkx_edges(G, pos, ax=ax, edgelist=[aresta_pintada], width=2.0, edge_color='red')
-        nx.draw_networkx_edges(G, pos, ax=ax, edgelist=[edge for edge in G.edges() if edge != aresta_pintada],
-                               width=1.0, alpha=0.5, edge_color='k')
-    else:
-        nx.draw_networkx_edges(G, pos, ax=ax, width=1.0, alpha=0.5, edge_color='k')
+    # Desenhe as arestas e nós para cada componente separadamente usando spring_layout
+    for idx, componente in enumerate(componentes):
+        subgrafo = G.subgraph(componente)
+        
+        # Atribui posições iniciais diferentes para cada subgrafo
+        if idx == 0:
+            pos = nx.spring_layout(subgrafo, seed=42)  # Seed 42 para reprodução
+        else:
+            pos = nx.spring_layout(subgrafo, seed=123)  # Seed 123 para reprodução
+        
+        # Aplique um deslocamento diferente a cada subgrafo
+        for k in pos:
+            if idx == 0:
+                pos[k][0] += idx * 2  # Ajuste o fator multiplicativo conforme necessário
+            else:
+                pos[k][0] -= idx * 2  # Ajuste o fator multiplicativo conforme necessário
 
-    # Desenhe os nós, rótulos e salve a imagem
-    nx.draw_networkx_nodes(G, pos, ax=ax, node_size=700, node_color="skyblue")
-    nx.draw_networkx_labels(G, pos, ax=ax, font_size=10, font_color="black", font_weight="bold")
+        if aresta_pintada and aresta_pintada in subgrafo.edges():
+            # Se uma aresta específica for definida, pinte essa aresta de vermelho
+            nx.draw_networkx_edges(subgrafo, pos, ax=ax, edgelist=[aresta_pintada],
+                                   width=2.0, edge_color='red')
+            nx.draw_networkx_edges(subgrafo, pos, ax=ax,
+                                   edgelist=[edge for edge in subgrafo.edges() if edge != aresta_pintada],
+                                   width=1.0, alpha=0.5, edge_color='k')
+        else:
+            nx.draw_networkx_edges(subgrafo, pos, ax=ax, width=1.0, alpha=0.5, edge_color='k')
+
+        # Desenhe os nós, rótulos e salve a imagem
+        nx.draw_networkx_nodes(subgrafo, pos, ax=ax, node_size=700, node_color="skyblue")
+        nx.draw_networkx_labels(subgrafo, pos, ax=ax, font_size=10, font_color="black", font_weight="bold")
 
     plt.savefig(caminho_imagem, format="png", bbox_inches="tight")
     plt.close()
 
+
+
 # Exemplo: gerar uma imagem do grafo
 matriz_adjacencia_exemplo = [
-    [0, 0, 1, 1, 0, 0, 0, 1, 0, 0],
+    [0, 0, 1, 1, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
     [1, 0, 0, 1, 0, 0, 0, 0, 0, 0],
     [1, 0, 1, 0, 0, 1, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 1, 1, 0, 1, 0],
-    [0, 0, 0, 1, 1, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 1, 0, 1, 0],
+    [0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
     [0, 1, 0, 0, 1, 0, 0, 1, 0, 0],
-    [1, 0, 0, 0, 0, 0, 1, 0, 0, 1],
+    [0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
     [0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
     [0, 0, 0, 0, 0, 0, 0, 1, 1, 0]
 ]
