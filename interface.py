@@ -1,8 +1,9 @@
 import PySimpleGUI as sg
 
-#! Gera o grafo e o salva como imagem
+# ! Gera o grafo e o salva como imagem
 import networkx as nx
 import matplotlib.pyplot as plt
+
 
 def gerar_imagem_do_grafo(matriz_adjacencia, caminho_imagem, aresta_pintada=None):
     G = nx.Graph()
@@ -25,13 +26,13 @@ def gerar_imagem_do_grafo(matriz_adjacencia, caminho_imagem, aresta_pintada=None
     # Desenhe as arestas e nós para cada componente separadamente usando spring_layout
     for idx, componente in enumerate(componentes):
         subgrafo = G.subgraph(componente)
-        
+
         # Atribui posições iniciais diferentes para cada subgrafo
         if idx == 0:
             pos = nx.spring_layout(subgrafo, seed=42)  # Seed 42 para reprodução
         else:
             pos = nx.spring_layout(subgrafo, seed=123)  # Seed 123 para reprodução
-        
+
         # Aplique um deslocamento diferente a cada subgrafo
         for k in pos:
             if idx == 0:
@@ -57,7 +58,6 @@ def gerar_imagem_do_grafo(matriz_adjacencia, caminho_imagem, aresta_pintada=None
     plt.close()
 
 
-
 # Exemplo: gerar uma imagem do grafo
 matriz_adjacencia_exemplo = [
     [0, 0, 1, 1, 0, 0, 0, 0, 0, 0],
@@ -78,8 +78,8 @@ aresta_escolhida = (1, 3)  # Define a aresta a ser pintada
 gerar_imagem_do_grafo(matriz_adjacencia_exemplo, caminho_imagem_saida, aresta_escolhida)
 print(f"Imagem do grafo gerada em: {caminho_imagem_saida}")
 
-    
-#! Exibir e mostrar opções doq fazer com o grafo
+
+# ! Exibir e mostrar opções doq fazer com o grafo
 def main():
     # Caminho predefinido da imagem
     caminho_imagem = "grafo/grafo.png"
@@ -87,11 +87,11 @@ def main():
     # Layout da interface
     layout = [
         [sg.Image(key="-IMAGE-")],
-        [sg.Push(),sg.Button('Verificar se é conexo', button_color=('white', 'DarkGreen')),sg.Push()],
-        [sg.Push(),sg.Button('Fazer busca em largura', button_color=('white', 'DarkGreen')),sg.Push()],
-        [sg.Push(),sg.Button('Mostrar bipartição do grafo', button_color=('white', 'DarkGreen')),sg.Push()],
-        [sg.Push(),sg.Button('Escolher outro grafo', button_color=('white', 'DarkGreen')),sg.Push()],
-        [sg.Push(),sg.Button('Sair', button_color=('white', 'DarkGreen')),sg.Push()]
+        [sg.Push(), sg.Button('Verificar se é conexo', button_color=('white', 'DarkGreen')), sg.Push()],
+        [sg.Push(), sg.Button('Aplicar busca em largura', button_color=('white', 'DarkGreen')), sg.Push()],
+        [sg.Push(), sg.Button('Mostrar bipartição do grafo', button_color=('white', 'DarkGreen')), sg.Push()],
+        [sg.Push(), sg.Button('Escolher outro grafo', button_color=('white', 'DarkGreen')), sg.Push()],
+        [sg.Push(), sg.Button('Sair', button_color=('white', 'DarkGreen')), sg.Push()]
     ]
 
     # Criar a janela
@@ -106,8 +106,12 @@ def main():
         if event == sg.WIN_CLOSED:
             break
 
+        if event == 'Sair':
+            break
+
     # Fechar a janela
     window.close()
+
 
 if __name__ == "__main__":
     main()

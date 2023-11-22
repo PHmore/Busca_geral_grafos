@@ -1,5 +1,6 @@
 import PySimpleGUI as sg
 
+
 def ler_matrizes_arquivo(caminho_arquivo):
     matrizes = []
     matriz_atual = []
@@ -21,6 +22,7 @@ def ler_matrizes_arquivo(caminho_arquivo):
             matrizes.append(matriz_atual)
 
     return matrizes
+
 
 # Leitura das matrizes
 caminho_do_arquivo = 'grafo/grafo.txt'
