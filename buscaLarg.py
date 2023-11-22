@@ -26,6 +26,7 @@ class Vertice:
 
 
 def gerar_imagem_do_grafo(matriz_adjacencia, caminho_imagem, aresta_pintada=None):
+    
     G = nx.Graph()
 
     # Converta a matriz de adjacência em uma lista de arestas
