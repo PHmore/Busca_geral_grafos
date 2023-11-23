@@ -1,8 +1,8 @@
-#Aqui estarão as outras funções
+# Aqui estarão as outras funções
 
-#Apresentar o grafo visualmente acima da opções
+# Apresentar o grafo visualmente acima da opções
 
-#Verificar se é conexo
+# Verificar se é conexo
 
 '''
 Será retornado 1 caso seja conexo e será retornado NULL caso não seja
@@ -11,7 +11,8 @@ ou NÃO, caso o grafo seja desconexo. Na sequência devem ser apresentados os co
 correspondentes a cada componente conexa que o grafo possuir
 '''
 
-#Será calculado o grau para que os 3 de maior grau sejam candidatos a raiz
+
+# Será calculado o grau para que os 3 de maior grau sejam candidatos a raiz
 def calcular_grau(grafo):
     grau = {}
 
@@ -19,6 +20,7 @@ def calcular_grau(grafo):
         grau[vertice] = len(vizinhos)
 
     return grau
+
 
 # Exemplo de um grafo representado por lista de adjacência
 grafo_exemplo = {
@@ -34,20 +36,18 @@ graus = calcular_grau(grafo_exemplo)
 for vertice, grau in graus.items():
     print(f'O vértice {vertice} possui grau {grau}')
 
+# Aplicar busca em largura
 
-#Aplicar busca em largura
 
-
-#Encontrar bipartição
+# Encontrar bipartição
 """
 7 – Caso o grafo seja bipartido, a opção 3 deve apresentar a bipartição do grafo, caso ele não seja
 bipartido, esta opção deve informar que é impossível encontrar a bipartição porque o grafo não é
 bipartido, em seguida apresentar o ciclo ímpar que há no grafo
 """
 
-
-#!A implementação deve ser original, i.e. não usar bibliotecas prontas para efetuar as principais
-#!tarefas solicitadas;
+# !A implementação deve ser original, i.e. não usar bibliotecas prontas para efetuar as principais
+# !tarefas solicitadas;
 
 
 """

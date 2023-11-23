@@ -1,4 +1,4 @@
-#Aqui será feita a busca em largura OBS: A busca deve ser realizada mesmo que o usuário selecione a opção 3
+# Aqui será feita a busca em largura OBS: A busca deve ser realizada mesmo que o usuário selecione a opção 3
 
 """
 6 – Caso o usuário selecione a opção “2” o programa deve perguntar: “Qual será o vértice raiz da
@@ -10,14 +10,23 @@ seria Bipartido, no caso de o grafo não ser;
 de aula;
 *** Os conjuntos de arestas geradas pela busca em largura devem ser apresentados.
 """
+import time
 
-import PySimpleGUI as sg
-
-#! Gera o grafo e o salva como imagem
+# ! Gera o grafo e o salva como imagem
 import networkx as nx
 import matplotlib.pyplot as plt
+import PySimpleGUI as sg
+
+
+class Vertice:
+    def __init__(self, numero_vertice):
+        self.marcado = False
+        self.adjacencia = list()
+        self.numero = numero_vertice
+
 
 def gerar_imagem_do_grafo(matriz_adjacencia, caminho_imagem, aresta_pintada=None):
+    
     G = nx.Graph()
 
     # Converta a matriz de adjacência em uma lista de arestas
@@ -38,13 +47,13 @@ def gerar_imagem_do_grafo(matriz_adjacencia, caminho_imagem, aresta_pintada=None
     # Desenhe as arestas e nós para cada componente separadamente usando spring_layout
     for idx, componente in enumerate(componentes):
         subgrafo = G.subgraph(componente)
-        
+
         # Atribui posições iniciais diferentes para cada subgrafo
         if idx == 0:
             pos = nx.spring_layout(subgrafo, seed=42)  # Seed 42 para reprodução
         else:
             pos = nx.spring_layout(subgrafo, seed=123)  # Seed 123 para reprodução
-        
+
         # Aplique um deslocamento diferente a cada subgrafo
         for k in pos:
             if idx == 0:
@@ -68,7 +77,7 @@ def gerar_imagem_do_grafo(matriz_adjacencia, caminho_imagem, aresta_pintada=None
 
     plt.savefig(caminho_imagem, format="png", bbox_inches="tight")
     plt.close()
-
+    return arestas
 
 
 # Exemplo: gerar uma imagem do grafo
@@ -86,15 +95,10 @@ matriz_adjacencia_exemplo = [
 ]
 
 caminho_imagem_saida = "grafo/grafo.png"
-print(f"Imagem do grafo gerada em: {caminho_imagem_saida}")
-x = 1
-
-import PySimpleGUI as sg
-
-
 caminho_imagem = "grafo/grafo.png"
-sg.theme ('Reddit')
+sg.theme('Reddit')
 
+gerar_imagem_do_grafo(matriz_adjacencia_exemplo, caminho_imagem)
 
 # Exemplo: criar uma fila com tamanho variável de 8
 tamanho = 8
@@ -103,8 +107,7 @@ layout = [[sg.Image(key="-IMAGE-")],
           [sg.Button('Busca')],
           [sg.Graph(canvas_size=(400, 50), graph_bottom_left=(0, 0), graph_top_right=(400, 50), key='graph')]]
 
-
-window = sg.Window('Janela está aberta',layout,resizable=True, finalize=True)
+window = sg.Window('Busca em Largura', layout, resizable=True, finalize=True)
 
 graph = window['graph']
 largura_celula = 400 // tamanho  # Divide a largura pelo número de elementos na fila
@@ -117,19 +120,62 @@ for i in range(tamanho):
 while True:
     window["-IMAGE-"].update(filename=caminho_imagem)
     event, values = window.read()
-    print(event, values)
-    
+
     if event == sg.WIN_CLOSED or event == 'Exit':
         break
 
     if event == 'Read':
         window['-IN-'].update('')
-    
+
     if event == 'Busca':
-        print("Será buscado" , x)
-        aresta_escolhida = (x, 3)  # Define a aresta a ser pintada
-        gerar_imagem_do_grafo(matriz_adjacencia_exemplo, caminho_imagem_saida, aresta_escolhida)
-        x=x+1
+        # Minha versão da busca em largura
+        fila = list()
+        vertices = list()
+
+        # Cria um nó para todos os vértices e aloca todos em uma lista
+        arestas = gerar_imagem_do_grafo(matriz_adjacencia_exemplo, caminho_imagem_saida)
+        num_vertices = 1
+        for v in arestas:
+            novo_no = Vertice(num_vertices)
+            num_vertices = num_vertices + 1
+            vertices.append(novo_no)
+
+        # Determina toda a vizinhança dos vértices
+        for v in vertices:
+            for n in arestas:
+                if v.numero in n:
+                    if n[0] == v.numero and n[1] not in v.adjacencia:
+                        v.adjacencia.append(n[1])
+                    elif n[1] == v.numero and n[0] not in v.adjacencia:
+                        v.adjacencia.append(n[0])
+
+        # Seja v o primeiro elemento
+        primeiro_vertice = 0
+        fila.append(vertices[primeiro_vertice])
+        vertices[primeiro_vertice].marcado = True
+        #print(vertices[primeiro_vertice].marcado, vertices[primeiro_vertice].numero)
+
+        while fila:
+            # Precisei remover de dentro do while para que execute
+
+            for vizinho in vertices[primeiro_vertice].adjacencia:  # Para a vizinhança de v
+                if not vertices[vizinho - 1].marcado:  # Se w não estiver marcado
+                    # Visitar (v, w)
+                    aresta_escolhida = (vertices[primeiro_vertice].numero, vizinho)
+                    gerar_imagem_do_grafo(matriz_adjacencia_exemplo, caminho_imagem_saida, aresta_escolhida)
+                    vertices[vizinho - 1].marcado = True  # Marcar w
+                    fila.append(vertices[vizinho - 1])  # Inserir w em Q
+
+                else:
+                    if vertices[vizinho - 1] in fila:  # Se w em Q
+                        # Visitar (v, w)
+                        aresta_escolhida = (vertices[primeiro_vertice].numero, vizinho)
+                        gerar_imagem_do_grafo(matriz_adjacencia_exemplo, caminho_imagem_saida, aresta_escolhida)
+            fila.remove(fila[primeiro_vertice])  # retirar v de Q
+
+            for ver in vertices:
+                print(ver.numero, ver.marcado, ver.adjacencia)
+
 
 """
 Algoritmo de busca em largura na implementação
