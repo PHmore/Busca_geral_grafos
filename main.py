@@ -8,6 +8,7 @@ from lerGrafo import gerar_imagem_do_grafo
 def main():
     # Caminho predefinido da imagem
     caminho_imagem = "grafo/grafo.png"
+    interface_lerGrafo()
 
     # Layout da interface
     layout = [
