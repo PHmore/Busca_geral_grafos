@@ -16,17 +16,10 @@ import time
 import networkx as nx
 import matplotlib.pyplot as plt
 import PySimpleGUI as sg
-
-
-class Vertice:
-    def __init__(self, numero_vertice):
-        self.marcado = False
-        self.adjacencia = list()
-        self.numero = numero_vertice
+from Vertice import Vertice
 
 
 def gerar_imagem_do_grafo(matriz_adjacencia, caminho_imagem, aresta_pintada=None):
-    
     G = nx.Graph()
 
     # Converta a matriz de adjacência em uma lista de arestas
@@ -82,14 +75,14 @@ def gerar_imagem_do_grafo(matriz_adjacencia, caminho_imagem, aresta_pintada=None
 
 # Exemplo: gerar uma imagem do grafo
 matriz_adjacencia_exemplo = [
-    [0, 0, 1, 1, 0, 0, 0, 0, 0, 0],
+    [0, 0, 1, 1, 0, 1, 0, 1, 0, 0],
     [0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
     [1, 0, 0, 1, 0, 0, 0, 0, 0, 0],
-    [1, 0, 1, 0, 0, 1, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 1, 0, 1, 0],
-    [0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+    [1, 0, 1, 0, 0, 1, 0, 1, 0, 0],
+    [0, 0, 0, 0, 0, 1, 1, 0, 1, 0],
+    [1, 0, 0, 1, 1, 0, 0, 1, 0, 0],
     [0, 1, 0, 0, 1, 0, 0, 1, 0, 0],
-    [0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
+    [1, 0, 0, 1, 0, 1, 1, 0, 0, 1],
     [0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
     [0, 0, 0, 0, 0, 0, 0, 1, 1, 0]
 ]
@@ -150,31 +143,29 @@ while True:
                         v.adjacencia.append(n[0])
 
         # Seja v o primeiro elemento
-        primeiro_vertice = 0
-        fila.append(vertices[primeiro_vertice])
-        vertices[primeiro_vertice].marcado = True
-        #print(vertices[primeiro_vertice].marcado, vertices[primeiro_vertice].numero)
+        primeiro_vertice = 1
+        fila.append(vertices[primeiro_vertice - 1])
+        vertices[primeiro_vertice - 1].marcado = True
 
         while fila:
-            # Precisei remover de dentro do while para que execute
-
-            for vizinho in vertices[primeiro_vertice].adjacencia:  # Para a vizinhança de v
+            for vizinho in vertices[primeiro_vertice - 1].adjacencia:  # Para a vizinhança de v
                 if not vertices[vizinho - 1].marcado:  # Se w não estiver marcado
-                    # Visitar (v, w)
-                    aresta_escolhida = (vertices[primeiro_vertice].numero, vizinho)
-                    gerar_imagem_do_grafo(matriz_adjacencia_exemplo, caminho_imagem_saida, aresta_escolhida)
+                    aresta_escolhida = (vertices[primeiro_vertice - 1].numero, vizinho)  # Visitar (v, w)
                     vertices[vizinho - 1].marcado = True  # Marcar w
                     fila.append(vertices[vizinho - 1])  # Inserir w em Q
 
+                    print(vertices[vizinho - 1].numero, vertices[vizinho - 1].marcado, vertices[vizinho - 1].adjacencia)
                 else:
                     if vertices[vizinho - 1] in fila:  # Se w em Q
-                        # Visitar (v, w)
-                        aresta_escolhida = (vertices[primeiro_vertice].numero, vizinho)
-                        gerar_imagem_do_grafo(matriz_adjacencia_exemplo, caminho_imagem_saida, aresta_escolhida)
-            fila.remove(fila[primeiro_vertice])  # retirar v de Q
+                        aresta_escolhida = (vertices[primeiro_vertice - 1].numero, vizinho)  # Visitar (v, w)
 
-            for ver in vertices:
-                print(ver.numero, ver.marcado, ver.adjacencia)
+            gerar_imagem_do_grafo(matriz_adjacencia_exemplo, caminho_imagem_saida, aresta_escolhida)  # Gera imagem
+            del fila[0]  # retirar v de Q
+
+            print('------Fila:')
+            for ver in range(0, len(fila)):
+                print(fila[ver].numero, fila[ver].marcado, fila[ver].adjacencia)
+            print('-----------')
 
 
 """
