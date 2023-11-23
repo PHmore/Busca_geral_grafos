@@ -17,9 +17,13 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import PySimpleGUI as sg
 from Vertice import Vertice
+from funGrafo import *
+from lerGrafo import *
 
+import networkx as nx
+import matplotlib.pyplot as plt
 
-def gerar_imagem_do_grafo(matriz_adjacencia, caminho_imagem, aresta_pintada=None):
+def gerar_imagem_do_grafo(matriz_adjacencia, caminho_imagem, arestas_visitadas=None, aresta_pintada=None):
     G = nx.Graph()
 
     # Converta a matriz de adjacência em uma lista de arestas
@@ -32,45 +36,31 @@ def gerar_imagem_do_grafo(matriz_adjacencia, caminho_imagem, aresta_pintada=None
 
     G.add_edges_from(arestas)
 
-    # Separa o grafo em componentes conectadas
-    componentes = list(nx.connected_components(G))
-
     fig, ax = plt.subplots()
 
-    # Desenhe as arestas e nós para cada componente separadamente usando spring_layout
-    for idx, componente in enumerate(componentes):
-        subgrafo = G.subgraph(componente)
+    pos = nx.spring_layout(G, seed=42)  # Posicionamento dos nós
 
-        # Atribui posições iniciais diferentes para cada subgrafo
-        if idx == 0:
-            pos = nx.spring_layout(subgrafo, seed=42)  # Seed 42 para reprodução
-        else:
-            pos = nx.spring_layout(subgrafo, seed=123)  # Seed 123 para reprodução
+    # Desenha todas as arestas do grafo
+    nx.draw_networkx_edges(G, pos, ax=ax, width=1.0, alpha=0.5, edge_color='k')
 
-        # Aplique um deslocamento diferente a cada subgrafo
-        for k in pos:
-            if idx == 0:
-                pos[k][0] += idx * 2  # Ajuste o fator multiplicativo conforme necessário
-            else:
-                pos[k][0] -= idx * 2  # Ajuste o fator multiplicativo conforme necessário
+    # Se houverem arestas visitadas, desenha-as em vermelho
+    if arestas_visitadas:
+        nx.draw_networkx_edges(G, pos, ax=ax, edgelist=arestas_visitadas,
+                               width=2.0, edge_color='red')
 
-        if aresta_pintada and aresta_pintada in subgrafo.edges():
-            # Se uma aresta específica for definida, pinte essa aresta de vermelho
-            nx.draw_networkx_edges(subgrafo, pos, ax=ax, edgelist=[aresta_pintada],
-                                   width=2.0, edge_color='red')
-            nx.draw_networkx_edges(subgrafo, pos, ax=ax,
-                                   edgelist=[edge for edge in subgrafo.edges() if edge != aresta_pintada],
-                                   width=1.0, alpha=0.5, edge_color='k')
-        else:
-            nx.draw_networkx_edges(subgrafo, pos, ax=ax, width=1.0, alpha=0.5, edge_color='k')
+    # Se houver uma aresta pintada, desenha-a em verde
+    if aresta_pintada:
+        nx.draw_networkx_edges(G, pos, ax=ax, edgelist=[aresta_pintada],
+                               width=2.0, edge_color='green')
 
-        # Desenhe os nós, rótulos e salve a imagem
-        nx.draw_networkx_nodes(subgrafo, pos, ax=ax, node_size=700, node_color="skyblue")
-        nx.draw_networkx_labels(subgrafo, pos, ax=ax, font_size=10, font_color="black", font_weight="bold")
+    # Desenha os nós, rótulos e salva a imagem
+    nx.draw_networkx_nodes(G, pos, ax=ax, node_size=700, node_color="skyblue")
+    nx.draw_networkx_labels(G, pos, ax=ax, font_size=10, font_color="black", font_weight="bold")
 
     plt.savefig(caminho_imagem, format="png", bbox_inches="tight")
     plt.close()
     return arestas
+
 
 
 # Exemplo: gerar uma imagem do grafo
@@ -87,11 +77,19 @@ matriz_adjacencia_exemplo = [
     [0, 0, 0, 0, 0, 0, 0, 1, 1, 0]
 ]
 
+lista = matriz_adjacencia_para_lista(matriz_adjacencia_exemplo)
+calcular_grau(lista)
+
+for vertice, grau in lista.items():
+    print(f'O vértice {vertice} possui grau {grau}')
+
 caminho_imagem_saida = "grafo/grafo.png"
 caminho_imagem = "grafo/grafo.png"
 sg.theme('Reddit')
 
-gerar_imagem_do_grafo(matriz_adjacencia_exemplo, caminho_imagem)
+arestas_visitada = [(1,4),(1,8),(1,6)]
+
+gerar_imagem_do_grafo(matriz_adjacencia_exemplo, caminho_imagem,arestas_visitada,(1,3))
 
 # Exemplo: criar uma fila com tamanho variável de 8
 tamanho = 8

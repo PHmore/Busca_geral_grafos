@@ -22,19 +22,10 @@ def calcular_grau(grafo):
     return grau
 
 
-# Exemplo de um grafo representado por lista de adjacência
-grafo_exemplo = {
-    'A': ['B', 'C'],
-    'B': ['A', 'C'],
-    'C': ['A', 'B', 'D'],
-    'D': ['C']
-}
 
-graus = calcular_grau(grafo_exemplo)
 
 # Exibir o grau de cada vértice
-for vertice, grau in graus.items():
-    print(f'O vértice {vertice} possui grau {grau}')
+
 
 # Aplicar busca em largura
 
