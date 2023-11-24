@@ -61,10 +61,10 @@ def gerar_imagem_do_grafo(matriz_adjacencia, caminho_imagem, no_atual = None,no_
     draw_nodes(G.nodes(), 'skyblue')
 
     if no_visitados:
-        draw_nodes(no_visitados, 'red')
+        draw_nodes(no_visitados, '#FF2E2E')
 
     if no_atual:
-        draw_nodes([no_atual], 'green')
+        draw_nodes([no_atual], '#63FF5C')
 
     nx.draw_networkx_labels(G, pos, ax=ax, font_size=10, font_color="black", font_weight="bold")
 
@@ -88,13 +88,13 @@ def colocar_arv (arvore, pai, filho, cor = "k"):
 
     # Configuração de tamanho para nós e arestas
     G.graph_attr.update(rankdir='TB')
-    G.node_attr.update({'style': 'filled', 'shape': 'circle', 'width': '0.1', 'height': '0.1'})  # Ajuste de tamanho dos nós
+    G.node_attr.update({'style': 'filled', 'shape': 'circle', 'width': '0.1', 'height': '0.1','color':'skyblue'})  # Ajuste de tamanho dos nós
     G.edge_attr.update({'penwidth': '3.0'})  # Ajuste de largura das arestas
 
     # Layout e geração da imagem com Graphviz
     G.layout(prog='dot')
         
-    G.draw('arvore.png')
+    G.draw('grafo/arvore.png')
     return arvore
 
 def buscar_em_largura(vertice_inicial=None,arvore = None):
@@ -144,7 +144,7 @@ def buscar_em_largura(vertice_inicial=None,arvore = None):
                 print ("Arvore pai ",vertice_atual.numero,"Filho ",vertices[vizinho - 1].numero)
                 colocar_arv(arvore,vertice_atual.numero,vertices[vizinho - 1].numero)
 
-                window["-IMAGE2-"].update(filename="arvore.png")
+                window["-IMAGE2-"].update(filename="grafo/arvore.png")
                 window.refresh()
                 time.sleep(3)
 
