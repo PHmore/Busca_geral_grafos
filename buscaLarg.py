@@ -82,9 +82,10 @@ def buscar_em_largura(vertice_inicial=None):
                     v.adjacencia.append(n[0])
 
     # Seja v o primeiro elemento
-    primeiro_vertice = 1
+    primeiro_vertice = 8
     fila = deque([vertices[primeiro_vertice - 1]])
     vertices[primeiro_vertice - 1].marcado = True
+    vertices_enfileirados.append(vertices[primeiro_vertice - 1].numero)
 
     while fila:
         vertice_atual = fila.popleft()
@@ -98,17 +99,22 @@ def buscar_em_largura(vertice_inicial=None):
                 vertices_enfileirados.append(vertices[vizinho - 1].numero)
                 gerar_imagem_do_grafo(matriz_adjacencia_exemplo, caminho_imagem_saida,
                                       arestas_visitadas, aresta_escolhida)  # Gera imagem
-                window["-TEXT-"].update(f'Vertices: {vertices_enfileirados}')
+                window["-TEXT-"].update(f'Fila: {vertices_enfileirados}')
                 window['-IMAGE-'].update(f'{caminho_imagem}')
                 window.refresh()
                 time.sleep(1)
+            else:
+                if vertices[vizinho - 1] in fila:
+                    aresta_escolhida = (vertice_atual.numero, vizinho)
+                    arestas_visitadas.append(aresta_escolhida)
+                    gerar_imagem_do_grafo(matriz_adjacencia_exemplo, caminho_imagem_saida,
+                                          arestas_visitadas, aresta_escolhida)  # Gera imagem
+                    window["-TEXT-"].update(f'Fila: {vertices_enfileirados}')
+                    window['-IMAGE-'].update(f'{caminho_imagem}')
+                    window.refresh()
+                    time.sleep(1)
 
-        print('------Fila:')
-        for ver in fila:
-            print(ver.numero, ver.marcado, ver.adjacencia)
-        print('-----------')
-
-        print(arestas_visitadas)
+        vertices_enfileirados.pop(0)
 
     gerar_imagem_do_grafo(matriz_adjacencia_exemplo, caminho_imagem_saida, arestas_visitadas)  # Gera imagem
     window["-TEXT-"].update(f'Vertices: {vertices_enfileirados}')
@@ -141,7 +147,7 @@ tamanho = 8
 vertices_enfileirados = list()
 layout = [[sg.Image(key="-IMAGE-")],
           [sg.Push(), sg.Button('Busca'), sg.Push()],
-          [sg.Text(f'Vertices: {vertices_enfileirados}', key="-TEXT-")]
+          [sg.Text(f'Fila: {vertices_enfileirados}', key="-TEXT-")]
           ]
 
 window = sg.Window('Busca em Largura', layout, resizable=True, finalize=True)
