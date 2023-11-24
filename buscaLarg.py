@@ -60,7 +60,7 @@ def gerar_imagem_do_grafo(matriz_adjacencia, caminho_imagem, arestas_visitadas=N
 
 
 def buscar_em_largura(vertice_inicial=None):
-    global fila
+    global vertices_enfileirados
     vertices = list()
     arestas_visitadas = list()
 
@@ -95,6 +95,13 @@ def buscar_em_largura(vertice_inicial=None):
                 arestas_visitadas.append(aresta_escolhida)
                 vertices[vizinho - 1].marcado = True
                 fila.append(vertices[vizinho - 1])
+                vertices_enfileirados.append(vertices[vizinho - 1].numero)
+                gerar_imagem_do_grafo(matriz_adjacencia_exemplo, caminho_imagem_saida,
+                                      arestas_visitadas, aresta_escolhida)  # Gera imagem
+                window["-TEXT-"].update(f'Vertices: {vertices_enfileirados}')
+                window['-IMAGE-'].update(f'{caminho_imagem}')
+                window.refresh()
+                time.sleep(1)
 
         print('------Fila:')
         for ver in fila:
@@ -104,6 +111,10 @@ def buscar_em_largura(vertice_inicial=None):
         print(arestas_visitadas)
 
     gerar_imagem_do_grafo(matriz_adjacencia_exemplo, caminho_imagem_saida, arestas_visitadas)  # Gera imagem
+    window["-TEXT-"].update(f'Vertices: {vertices_enfileirados}')
+    window['-IMAGE-'].update(f'{caminho_imagem}')
+    window.refresh()
+    #time.sleep(1)
 
 
 # Exemplo: gerar uma imagem do grafo
@@ -120,19 +131,17 @@ matriz_adjacencia_exemplo = [
     [0, 0, 0, 0, 0, 0, 0, 1, 1, 0]
 ]
 
-caminho_imagem_saida = "grafo/grafo.png"
-caminho_imagem = "grafo/grafo.png"
+caminho_imagem_saida = caminho_imagem = "grafo/grafo.png"
 sg.theme('Reddit')
 
 gerar_imagem_do_grafo(matriz_adjacencia_exemplo, caminho_imagem)
 
 # Exemplo: criar uma fila com tamanho variável de 8
 tamanho = 8
-fila = list()
-
+vertices_enfileirados = list()
 layout = [[sg.Image(key="-IMAGE-")],
           [sg.Push(), sg.Button('Busca'), sg.Push()],
-          [sg.Text(f'Vértices: {fila}')]
+          [sg.Text(f'Vertices: {vertices_enfileirados}', key="-TEXT-")]
           ]
 
 window = sg.Window('Busca em Largura', layout, resizable=True, finalize=True)
