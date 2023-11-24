@@ -73,6 +73,59 @@ def gerar_imagem_do_grafo(matriz_adjacencia, caminho_imagem, aresta_pintada=None
     return arestas
 
 
+def buscar_em_largura(vertice_inicial=None):
+    global fila
+    vertices = list()
+    arestas_visitadas = list()
+
+    # Cria um nó para todos os vértices e aloca todos em uma lista
+    arestas = gerar_imagem_do_grafo(matriz_adjacencia_exemplo, caminho_imagem_saida)
+    num_vertices = 1
+    for v in arestas:
+        novo_no = Vertice(num_vertices)
+        num_vertices = num_vertices + 1
+        vertices.append(novo_no)
+
+    # Determina toda a vizinhança dos vértices
+    for v in vertices:
+        for n in arestas:
+            if v.numero in n:
+                if n[0] == v.numero and n[1] not in v.adjacencia:
+                    v.adjacencia.append(n[1])
+                elif n[1] == v.numero and n[0] not in v.adjacencia:
+                    v.adjacencia.append(n[0])
+
+    # Seja v o primeiro elemento
+    primeiro_vertice = 1
+    fila.append(vertices[primeiro_vertice - 1])
+    vertices[primeiro_vertice - 1].marcado = True
+
+    while fila:
+        for vizinho in vertices[primeiro_vertice - 1].adjacencia:  # Para a vizinhança de v
+            if not vertices[vizinho - 1].marcado:  # Se w não estiver marcado
+                aresta_escolhida = (vertices[primeiro_vertice - 1].numero, vizinho)  # Visitar (v, w)
+                arestas_visitadas.append(aresta_escolhida)
+                vertices[vizinho - 1].marcado = True  # Marcar w
+                fila.append(vertices[vizinho - 1])  # Inserir w em Q
+
+            else:
+                if vertices[vizinho - 1] in fila:  # Se w em Q
+                    aresta_escolhida = (vertices[primeiro_vertice - 1].numero, vizinho)  # Visitar (v, w)
+                    if aresta_escolhida not in arestas_visitadas:
+                        arestas_visitadas.append(aresta_escolhida)
+
+        print('------Fila:')
+        for ver in range(0, len(fila)):
+            print(fila[ver].numero, fila[ver].marcado, fila[ver].adjacencia)
+        print('-----------')
+
+        print(arestas_visitadas)
+
+        gerar_imagem_do_grafo(matriz_adjacencia_exemplo, caminho_imagem_saida, aresta_escolhida)  # Gera imagem
+        del fila[0]  # retirar v de Q
+
+
+
 # Exemplo: gerar uma imagem do grafo
 matriz_adjacencia_exemplo = [
     [0, 0, 1, 1, 0, 1, 0, 1, 0, 0],
@@ -95,20 +148,14 @@ gerar_imagem_do_grafo(matriz_adjacencia_exemplo, caminho_imagem)
 
 # Exemplo: criar uma fila com tamanho variável de 8
 tamanho = 8
+fila = list()
 
 layout = [[sg.Image(key="-IMAGE-")],
-          [sg.Button('Busca')],
-          [sg.Graph(canvas_size=(400, 50), graph_bottom_left=(0, 0), graph_top_right=(400, 50), key='graph')]]
+          [sg.Push(), sg.Button('Busca'), sg.Push()],
+          [sg.Text(f'Vértices: {fila}')]
+          ]
 
 window = sg.Window('Busca em Largura', layout, resizable=True, finalize=True)
-
-graph = window['graph']
-largura_celula = 400 // tamanho  # Divide a largura pelo número de elementos na fila
-altura_celula = 50
-
-for i in range(tamanho):
-    graph.draw_rectangle((i * largura_celula, 0), (i * largura_celula + largura_celula, altura_celula),
-                         line_color='black')
 
 while True:
     window["-IMAGE-"].update(filename=caminho_imagem)
@@ -119,54 +166,11 @@ while True:
 
     if event == 'Read':
         window['-IN-'].update('')
+        window.Refresh()
 
     if event == 'Busca':
-        # Minha versão da busca em largura
-        fila = list()
-        vertices = list()
-
-        # Cria um nó para todos os vértices e aloca todos em uma lista
-        arestas = gerar_imagem_do_grafo(matriz_adjacencia_exemplo, caminho_imagem_saida)
-        num_vertices = 1
-        for v in arestas:
-            novo_no = Vertice(num_vertices)
-            num_vertices = num_vertices + 1
-            vertices.append(novo_no)
-
-        # Determina toda a vizinhança dos vértices
-        for v in vertices:
-            for n in arestas:
-                if v.numero in n:
-                    if n[0] == v.numero and n[1] not in v.adjacencia:
-                        v.adjacencia.append(n[1])
-                    elif n[1] == v.numero and n[0] not in v.adjacencia:
-                        v.adjacencia.append(n[0])
-
-        # Seja v o primeiro elemento
-        primeiro_vertice = 1
-        fila.append(vertices[primeiro_vertice - 1])
-        vertices[primeiro_vertice - 1].marcado = True
-
-        while fila:
-            for vizinho in vertices[primeiro_vertice - 1].adjacencia:  # Para a vizinhança de v
-                if not vertices[vizinho - 1].marcado:  # Se w não estiver marcado
-                    aresta_escolhida = (vertices[primeiro_vertice - 1].numero, vizinho)  # Visitar (v, w)
-                    vertices[vizinho - 1].marcado = True  # Marcar w
-                    fila.append(vertices[vizinho - 1])  # Inserir w em Q
-
-                    print(vertices[vizinho - 1].numero, vertices[vizinho - 1].marcado, vertices[vizinho - 1].adjacencia)
-                else:
-                    if vertices[vizinho - 1] in fila:  # Se w em Q
-                        aresta_escolhida = (vertices[primeiro_vertice - 1].numero, vizinho)  # Visitar (v, w)
-
-            gerar_imagem_do_grafo(matriz_adjacencia_exemplo, caminho_imagem_saida, aresta_escolhida)  # Gera imagem
-            del fila[0]  # retirar v de Q
-
-            print('------Fila:')
-            for ver in range(0, len(fila)):
-                print(fila[ver].numero, fila[ver].marcado, fila[ver].adjacencia)
-            print('-----------')
-
+        buscar_em_largura()
+        window.Refresh()
 
 """
 Algoritmo de busca em largura na implementação
