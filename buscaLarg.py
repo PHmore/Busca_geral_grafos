@@ -61,7 +61,11 @@ def gerar_imagem_do_grafo(matriz_adjacencia, caminho_imagem, arestas_visitadas=N
     plt.close()
     return arestas
 
+def realizar_busca(matriz):
+    print("A busca será realizada")
 
+def colocar_arv (vertice):
+    print("O nó será colocado na árvore")
 
 # Exemplo: gerar uma imagem do grafo
 matriz_adjacencia_exemplo = [
@@ -158,7 +162,7 @@ while True:
                     if vertices[vizinho - 1] in fila:  # Se w em Q
                         aresta_escolhida = (vertices[primeiro_vertice - 1].numero, vizinho)  # Visitar (v, w)
 
-            gerar_imagem_do_grafo(matriz_adjacencia_exemplo, caminho_imagem_saida, aresta_escolhida)  # Gera imagem
+            gerar_imagem_do_grafo(matriz_adjacencia_exemplo, caminho_imagem_saida, None,aresta_escolhida)  # Gera imagem
             del fila[0]  # retirar v de Q
 
             print('------Fila:')
