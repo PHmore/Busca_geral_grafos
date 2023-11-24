@@ -24,7 +24,7 @@ from collections import deque
 import networkx as nx
 import matplotlib.pyplot as plt
 
-def gerar_imagem_do_grafo(matriz_adjacencia, caminho_imagem, arestas_visitadas=None, aresta_pintada=None):
+def gerar_imagem_do_grafo(matriz_adjacencia, caminho_imagem, no_atual = None,no_visitados = None,arestas_visitadas=None, aresta_pintada=None):
     G = nx.Graph()
 
     # Converta a matriz de adjacência em uma lista de arestas
@@ -36,57 +36,48 @@ def gerar_imagem_do_grafo(matriz_adjacencia, caminho_imagem, arestas_visitadas=N
                 arestas.append((i + 1, j + 1))
 
     G.add_edges_from(arestas)
-
     fig, ax = plt.subplots()
 
     pos = nx.spring_layout(G, seed=42)  # Posicionamento dos nós
 
-    # Desenha todas as arestas do grafo
-    nx.draw_networkx_edges(G, pos, ax=ax, width=1.0, alpha=0.5, edge_color='k')
+    # Função para desenhar arestas com base na cor e na lista de arestas
+    def draw_edges(edges, color, width):
+        nx.draw_networkx_edges(G, pos, ax=ax, edgelist=edges, width=width, edge_color=color)
+
+    # Desenha todas as arestas do grafo em preto
+    draw_edges(G.edges(), 'k', 1.0)
 
     # Se houverem arestas visitadas, desenha-as em vermelho
     if arestas_visitadas:
-        nx.draw_networkx_edges(G, pos, ax=ax, edgelist=arestas_visitadas,
-                               width=2.0, edge_color='red')
+        draw_edges(arestas_visitadas, 'red', 2.0)
 
     # Se houver uma aresta pintada, desenha-a em verde
     if aresta_pintada:
-        nx.draw_networkx_edges(G, pos, ax=ax, edgelist=[aresta_pintada],
-                               width=2.0, edge_color='green')
-    pos = nx.spring_layout(G, seed=42)  # Posicionamento dos nós
+        draw_edges([aresta_pintada], 'green', 2.0)
 
-    # Desenha todas as arestas do grafo
-    nx.draw_networkx_edges(G, pos, ax=ax, width=1.0, alpha=0.5, edge_color='k')
-
-    # Se houverem arestas visitadas, desenha-as em vermelho
-    if arestas_visitadas:
-        nx.draw_networkx_edges(G, pos, ax=ax, edgelist=arestas_visitadas,
-                               width=2.0, edge_color='red')
-
-    # Se houver uma aresta pintada, desenha-a em verde
-    if aresta_pintada:
-        nx.draw_networkx_edges(G, pos, ax=ax, edgelist=[aresta_pintada],
-                               width=2.0, edge_color='green')
+    def draw_nodes(nodes, color):
+        nx.draw_networkx_nodes(G, pos, ax=ax, nodelist=nodes, node_size=700, node_color=color)
 
     # Desenha os nós, rótulos e salva a imagem
-    nx.draw_networkx_nodes(G, pos, ax=ax, node_size=700, node_color="skyblue")
-    nx.draw_networkx_labels(G, pos, ax=ax, font_size=10, font_color="black", font_weight="bold")
-    # Desenha os nós, rótulos e salva a imagem
-    nx.draw_networkx_nodes(G, pos, ax=ax, node_size=700, node_color="skyblue")
+    draw_nodes(G.nodes(), 'skyblue')
+
+    if no_visitados:
+        draw_nodes(no_visitados, 'red')
+
+    if no_atual:
+        draw_nodes([no_atual], 'green')
+
     nx.draw_networkx_labels(G, pos, ax=ax, font_size=10, font_color="black", font_weight="bold")
 
     plt.savefig(caminho_imagem, format="png", bbox_inches="tight")
     plt.close()
     return arestas
 
-def realizar_busca(matriz):
-    print("A busca será realizada")
-
 def colocar_arv (vertice):
     print("O nó será colocado na árvore")
 
 def buscar_em_largura(vertice_inicial=None):
-    global fila
+    global vertices_enfileirados
     vertices = list()
     arestas_visitadas = list()
 
@@ -114,6 +105,7 @@ def buscar_em_largura(vertice_inicial=None):
 
     while fila:
         vertice_atual = fila.popleft()
+        print(vertice_atual.numero)
 
         for vizinho in vertice_atual.adjacencia:
             if not vertices[vizinho - 1].marcado:
@@ -121,6 +113,13 @@ def buscar_em_largura(vertice_inicial=None):
                 arestas_visitadas.append(aresta_escolhida)
                 vertices[vizinho - 1].marcado = True
                 fila.append(vertices[vizinho - 1])
+                vertices_enfileirados.append(vertices[vizinho - 1].numero)
+                gerar_imagem_do_grafo(matriz_adjacencia_exemplo, caminho_imagem_saida, vertice_atual.numero, vertices_enfileirados,
+                                      arestas_visitadas, aresta_escolhida)  # Gera imagem
+                window["-TEXT-"].update(f'Vertices: {vertices_enfileirados}')
+                window['-IMAGE-'].update(f'{caminho_imagem}')
+                window.refresh()
+                time.sleep(3)
 
         print('------Fila:')
         for ver in fila:
@@ -129,7 +128,12 @@ def buscar_em_largura(vertice_inicial=None):
 
         print(arestas_visitadas)
 
-    gerar_imagem_do_grafo(matriz_adjacencia_exemplo, caminho_imagem_saida, arestas_visitadas)  # Gera imagem
+    gerar_imagem_do_grafo(matriz_adjacencia_exemplo, caminho_imagem_saida, vertice_atual.numero, None,
+                                      arestas_visitadas, aresta_escolhida)  # Gera imagem
+    window["-TEXT-"].update(f'Vertices: {vertices_enfileirados}')
+    window['-IMAGE-'].update(f'{caminho_imagem}')
+    window.refresh()
+    #time.sleep(1)
 
 
 # Exemplo: gerar uma imagem do grafo
@@ -146,28 +150,24 @@ matriz_adjacencia_exemplo = [
     [0, 0, 0, 0, 0, 0, 0, 1, 1, 0]
 ]
 
+gerar_imagem_do_grafo(matriz_adjacencia_exemplo, "grafo/grafo.png")
+
 lista = matriz_adjacencia_para_lista(matriz_adjacencia_exemplo)
 calcular_grau(lista)
 
 for vertice, grau in lista.items():
     print(f'O vértice {vertice} possui grau {grau}')
 
-caminho_imagem_saida = "grafo/grafo.png"
-caminho_imagem = "grafo/grafo.png"
+caminho_imagem_saida = caminho_imagem = "grafo/grafo.png"
 sg.theme('Reddit')
-
-arestas_visitada = [(1,4),(1,8),(1,6)]
-
-gerar_imagem_do_grafo(matriz_adjacencia_exemplo, caminho_imagem,arestas_visitada,(1,3))
 
 
 # Exemplo: criar uma fila com tamanho variável de 8
 tamanho = 8
-fila = list()
-
+vertices_enfileirados = list()
 layout = [[sg.Image(key="-IMAGE-")],
           [sg.Push(), sg.Button('Busca'), sg.Push()],
-          [sg.Text(f'Vértices: {fila}')]
+          [sg.Text(f'Vertices: {vertices_enfileirados}', key="-TEXT-")]
           ]
 
 window = sg.Window('Busca em Largura', layout, resizable=True, finalize=True)
