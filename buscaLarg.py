@@ -19,6 +19,7 @@ import PySimpleGUI as sg
 from Vertice import Vertice
 from funGrafo import *
 from lerGrafo import *
+from collections import deque
 
 import networkx as nx
 import matplotlib.pyplot as plt
@@ -52,7 +53,24 @@ def gerar_imagem_do_grafo(matriz_adjacencia, caminho_imagem, arestas_visitadas=N
     if aresta_pintada:
         nx.draw_networkx_edges(G, pos, ax=ax, edgelist=[aresta_pintada],
                                width=2.0, edge_color='green')
+    pos = nx.spring_layout(G, seed=42)  # Posicionamento dos nós
 
+    # Desenha todas as arestas do grafo
+    nx.draw_networkx_edges(G, pos, ax=ax, width=1.0, alpha=0.5, edge_color='k')
+
+    # Se houverem arestas visitadas, desenha-as em vermelho
+    if arestas_visitadas:
+        nx.draw_networkx_edges(G, pos, ax=ax, edgelist=arestas_visitadas,
+                               width=2.0, edge_color='red')
+
+    # Se houver uma aresta pintada, desenha-a em verde
+    if aresta_pintada:
+        nx.draw_networkx_edges(G, pos, ax=ax, edgelist=[aresta_pintada],
+                               width=2.0, edge_color='green')
+
+    # Desenha os nós, rótulos e salva a imagem
+    nx.draw_networkx_nodes(G, pos, ax=ax, node_size=700, node_color="skyblue")
+    nx.draw_networkx_labels(G, pos, ax=ax, font_size=10, font_color="black", font_weight="bold")
     # Desenha os nós, rótulos e salva a imagem
     nx.draw_networkx_nodes(G, pos, ax=ax, node_size=700, node_color="skyblue")
     nx.draw_networkx_labels(G, pos, ax=ax, font_size=10, font_color="black", font_weight="bold")
@@ -66,6 +84,53 @@ def realizar_busca(matriz):
 
 def colocar_arv (vertice):
     print("O nó será colocado na árvore")
+
+def buscar_em_largura(vertice_inicial=None):
+    global fila
+    vertices = list()
+    arestas_visitadas = list()
+
+    # Cria um nó para todos os vértices e aloca todos em uma lista
+    arestas = gerar_imagem_do_grafo(matriz_adjacencia_exemplo, caminho_imagem_saida)
+    num_vertices = 1
+    for v in arestas:
+        novo_no = Vertice(num_vertices)
+        num_vertices += 1
+        vertices.append(novo_no)
+
+    # Determina toda a vizinhança dos vértices
+    for v in vertices:
+        for n in arestas:
+            if v.numero in n:
+                if n[0] == v.numero and n[1] not in v.adjacencia:
+                    v.adjacencia.append(n[1])
+                elif n[1] == v.numero and n[0] not in v.adjacencia:
+                    v.adjacencia.append(n[0])
+
+    # Seja v o primeiro elemento
+    primeiro_vertice = 1
+    fila = deque([vertices[primeiro_vertice - 1]])
+    vertices[primeiro_vertice - 1].marcado = True
+
+    while fila:
+        vertice_atual = fila.popleft()
+
+        for vizinho in vertice_atual.adjacencia:
+            if not vertices[vizinho - 1].marcado:
+                aresta_escolhida = (vertice_atual.numero, vizinho)
+                arestas_visitadas.append(aresta_escolhida)
+                vertices[vizinho - 1].marcado = True
+                fila.append(vertices[vizinho - 1])
+
+        print('------Fila:')
+        for ver in fila:
+            print(ver.numero, ver.marcado, ver.adjacencia)
+        print('-----------')
+
+        print(arestas_visitadas)
+
+    gerar_imagem_do_grafo(matriz_adjacencia_exemplo, caminho_imagem_saida, arestas_visitadas)  # Gera imagem
+
 
 # Exemplo: gerar uma imagem do grafo
 matriz_adjacencia_exemplo = [
@@ -98,20 +163,14 @@ gerar_imagem_do_grafo(matriz_adjacencia_exemplo, caminho_imagem,arestas_visitada
 
 # Exemplo: criar uma fila com tamanho variável de 8
 tamanho = 8
+fila = list()
 
 layout = [[sg.Image(key="-IMAGE-")],
-          [sg.Button('Busca')],
-          [sg.Graph(canvas_size=(400, 50), graph_bottom_left=(0, 0), graph_top_right=(400, 50), key='graph')]]
+          [sg.Push(), sg.Button('Busca'), sg.Push()],
+          [sg.Text(f'Vértices: {fila}')]
+          ]
 
 window = sg.Window('Busca em Largura', layout, resizable=True, finalize=True)
-
-graph = window['graph']
-largura_celula = 400 // tamanho  # Divide a largura pelo número de elementos na fila
-altura_celula = 50
-
-for i in range(tamanho):
-    graph.draw_rectangle((i * largura_celula, 0), (i * largura_celula + largura_celula, altura_celula),
-                         line_color='black')
 
 while True:
     window["-IMAGE-"].update(filename=caminho_imagem)
@@ -122,8 +181,13 @@ while True:
 
     if event == 'Read':
         window['-IN-'].update('')
+        window.Refresh()
 
     if event == 'Busca':
+        buscar_em_largura()
+        window.Refresh()
+        
+        """
         # Minha versão da busca em largura
         fila = list()
         vertices = list()
@@ -171,7 +235,7 @@ while True:
             print('-----------')
 
             arestas_visitada.append((1,3))
-            gerar_imagem_do_grafo(matriz_adjacencia_exemplo, caminho_imagem,arestas_visitada,(3,4))
+            gerar_imagem_do_grafo(matriz_adjacencia_exemplo, caminho_imagem,arestas_visitada,(3,4))"""
 
 
 """

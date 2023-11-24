@@ -13,9 +13,10 @@ def main():
     # Layout da interface
     layout = [
         [sg.Image(key="-IMAGE-")],
-        [sg.Push(), sg.Button('Verificar se é conexo',size=(20, 1), button_color=('white', 'DarkGreen')), sg.Push()
-        , sg.Button('Aplicar busca em largura',size=(20, 1), button_color=('white', 'DarkGreen')), sg.Push()
-        , sg.Button('Mostrar bipartição do grafo',size=(20, 1), button_color=('white', 'DarkGreen')), sg.Push()],
+        [sg.Push(), sg.Button('Verificar se é conexo',size=(20, 1), button_color=('white', 'DarkGreen')),
+         sg.Push(), sg.Button('Aplicar busca em largura',size=(20, 1), button_color=('white', 'DarkGreen')),
+         sg.Push(), sg.Button('Mostrar bipartição do grafo',size=(20, 1),
+                              button_color=('white', 'DarkGreen')), sg.Push()],
         [sg.Push()],
         [sg.Push(), sg.Button('Escolher outro grafo',size=(20, 1), button_color=('white', 'DarkBlue')), sg.Push()],
         [sg.Push(), sg.Button('Sair',size=(20, 1), button_color=('white', 'DarkRed')), sg.Push()]
