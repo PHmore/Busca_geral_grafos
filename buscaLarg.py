@@ -98,12 +98,15 @@ def colocar_arv (arvore, pai, filho, cor = "k"):
     return arvore
 
 def buscar_em_largura(vertice_inicial=None,arvore = None):
+    #inicializa variaveis
     global vertices_enfileirados
     vertices = list()
     arestas_visitadas = list()
 
-    # Cria um nó para todos os vértices e aloca todos em uma lista
+    #Receve um array com as arestas do grafo
     arestas = gerar_imagem_do_grafo(matriz_adjacencia_exemplo, caminho_imagem_saida)
+    
+    # Cria um nó para todos os vértices e aloca todos em uma lista
     num_vertices = 1
     for v in arestas:
         novo_no = Vertice(num_vertices)
@@ -121,10 +124,16 @@ def buscar_em_largura(vertice_inicial=None,arvore = None):
 
     # Seja v o primeiro elemento
     primeiro_vertice = 8
-    fila = deque([vertices[primeiro_vertice - 1]])
-    vertices[primeiro_vertice - 1].marcado = True
-    colocar_arv(arvore,None,primeiro_vertice)
 
+    #criação de uma fila duplamente encadeada
+    fila = deque([vertices[primeiro_vertice - 1]])
+
+    #Marca, visita e insere o primeiro vértice na árvore
+    vertices[primeiro_vertice - 1].marcado = True
+    vertices_enfileirados.append(vertices[primeiro_vertice - 1].numero)
+    #colocar_arv(arvore,None,primeiro_vertice)
+
+    #Enquanto existir a fila
     while fila:
         vertice_atual = fila.popleft()
         print(vertice_atual.numero)
@@ -180,10 +189,11 @@ for vertice, grau in lista.items():
     print(f'O vértice {vertice} possui grau {grau}')
 
 caminho_imagem_saida = caminho_imagem = "grafo/grafo.png"
+
 sg.theme('Reddit')
 
 arvore = nx.Graph()
-
+colocar_arv(arvore,None,8)
 # Exemplo: criar uma fila com tamanho variável de 8
 tamanho = 8
 vertices_enfileirados = list()
