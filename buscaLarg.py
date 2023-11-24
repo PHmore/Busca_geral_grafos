@@ -17,6 +17,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import PySimpleGUI as sg
 from Vertice import Vertice
+from collections import deque
 
 
 def gerar_imagem_do_grafo(matriz_adjacencia, caminho_imagem, arestas_visitadas=None, aresta_pintada=None):
@@ -68,7 +69,7 @@ def buscar_em_largura(vertice_inicial=None):
     num_vertices = 1
     for v in arestas:
         novo_no = Vertice(num_vertices)
-        num_vertices = num_vertices + 1
+        num_vertices += 1
         vertices.append(novo_no)
 
     # Determina toda a vizinhança dos vértices
@@ -82,32 +83,27 @@ def buscar_em_largura(vertice_inicial=None):
 
     # Seja v o primeiro elemento
     primeiro_vertice = 1
-    fila.append(vertices[primeiro_vertice - 1])
+    fila = deque([vertices[primeiro_vertice - 1]])
     vertices[primeiro_vertice - 1].marcado = True
 
     while fila:
-        for vizinho in vertices[primeiro_vertice - 1].adjacencia:  # Para a vizinhança de v
-            if not vertices[vizinho - 1].marcado:  # Se w não estiver marcado
-                aresta_escolhida = (vertices[primeiro_vertice - 1].numero, vizinho)  # Visitar (v, w)
-                arestas_visitadas.append(aresta_escolhida)
-                vertices[vizinho - 1].marcado = True  # Marcar w
-                fila.append(vertices[vizinho - 1])  # Inserir w em Q
+        vertice_atual = fila.popleft()
 
-            else:
-                if vertices[vizinho - 1] in fila:  # Se w em Q
-                    aresta_escolhida = (vertices[primeiro_vertice - 1].numero, vizinho)  # Visitar (v, w)
-                    if aresta_escolhida not in arestas_visitadas:
-                        arestas_visitadas.append(aresta_escolhida)
+        for vizinho in vertice_atual.adjacencia:
+            if not vertices[vizinho - 1].marcado:
+                aresta_escolhida = (vertice_atual.numero, vizinho)
+                arestas_visitadas.append(aresta_escolhida)
+                vertices[vizinho - 1].marcado = True
+                fila.append(vertices[vizinho - 1])
 
         print('------Fila:')
-        for ver in range(0, len(fila)):
-            print(fila[ver].numero, fila[ver].marcado, fila[ver].adjacencia)
+        for ver in fila:
+            print(ver.numero, ver.marcado, ver.adjacencia)
         print('-----------')
 
         print(arestas_visitadas)
 
-        gerar_imagem_do_grafo(matriz_adjacencia_exemplo, caminho_imagem_saida, arestas_visitadas, aresta_escolhida)  # Gera imagem
-        del fila[0]  # retirar v de Q
+    gerar_imagem_do_grafo(matriz_adjacencia_exemplo, caminho_imagem_saida, arestas_visitadas)  # Gera imagem
 
 
 # Exemplo: gerar uma imagem do grafo
