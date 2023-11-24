@@ -91,6 +91,7 @@ arestas_visitada = [(1,4),(1,8),(1,6)]
 
 gerar_imagem_do_grafo(matriz_adjacencia_exemplo, caminho_imagem,arestas_visitada,(1,3))
 
+
 # Exemplo: criar uma fila com tamanho variável de 8
 tamanho = 8
 
@@ -164,6 +165,9 @@ while True:
             for ver in range(0, len(fila)):
                 print(fila[ver].numero, fila[ver].marcado, fila[ver].adjacencia)
             print('-----------')
+
+            arestas_visitada.append((1,3))
+            gerar_imagem_do_grafo(matriz_adjacencia_exemplo, caminho_imagem,arestas_visitada,(3,4))
 
 
 """
