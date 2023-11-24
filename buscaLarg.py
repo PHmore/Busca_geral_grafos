@@ -58,10 +58,19 @@ def gerar_imagem_do_grafo(matriz_adjacencia, caminho_imagem, no_atual = None,no_
         nx.draw_networkx_nodes(G, pos, ax=ax, nodelist=nodes, node_size=700, node_color=color)
 
     # Desenha os nós, rótulos e salva a imagem
-    draw_nodes(G.nodes(), 'skyblue')
+    draw_nodes(G.nodes(), 'gray')
 
-    if no_visitados:
-        draw_nodes(no_visitados, '#FF2E2E')
+    if no_visitados and vertices_enfileirados:
+        resultado = list(set(no_visitados)-set(vertices_enfileirados))
+        print(resultado)
+    else: 
+        resultado = None 
+
+    if resultado:
+        draw_nodes(resultado, '#FF2E2E')
+    
+    if vertices_enfileirados:
+        draw_nodes(vertices_enfileirados, 'skyblue')
 
     if no_atual:
         draw_nodes([no_atual], '#63FF5C')
@@ -98,15 +107,14 @@ def colocar_arv (arvore, pai, filho, cor = "k"):
     return arvore
 
 def buscar_em_largura(vertice_inicial=None,arvore = None):
-    #inicializa variaveis
     global vertices_enfileirados
+    
+    vertices_visitados = list ()
     vertices = list()
     arestas_visitadas = list()
 
-    #Receve um array com as arestas do grafo
-    arestas = gerar_imagem_do_grafo(matriz_adjacencia_exemplo, caminho_imagem_saida)
-    
     # Cria um nó para todos os vértices e aloca todos em uma lista
+    arestas = gerar_imagem_do_grafo(matriz_adjacencia_exemplo, caminho_imagem_saida)
     num_vertices = 1
     for v in arestas:
         novo_no = Vertice(num_vertices)
@@ -123,47 +131,57 @@ def buscar_em_largura(vertice_inicial=None,arvore = None):
                     v.adjacencia.append(n[0])
 
     # Seja v o primeiro elemento
-    primeiro_vertice = 8
-
-    #criação de uma fila duplamente encadeada
+    primeiro_vertice = 2
     fila = deque([vertices[primeiro_vertice - 1]])
-
-    #Marca, visita e insere o primeiro vértice na árvore
     vertices[primeiro_vertice - 1].marcado = True
     vertices_enfileirados.append(vertices[primeiro_vertice - 1].numero)
-    #colocar_arv(arvore,None,primeiro_vertice)
+    vertices_visitados.append(vertices[primeiro_vertice - 1].numero)
+    colocar_arv(arvore,None,primeiro_vertice)
 
-    #Enquanto existir a fila
     while fila:
         vertice_atual = fila.popleft()
-        print(vertice_atual.numero)
-
+        
+        #Para cada vizinho
         for vizinho in vertice_atual.adjacencia:
+
+            #Se não tiver marcado
             if not vertices[vizinho - 1].marcado:
                 aresta_escolhida = (vertice_atual.numero, vizinho)
                 arestas_visitadas.append(aresta_escolhida)
                 vertices[vizinho - 1].marcado = True
                 fila.append(vertices[vizinho - 1])
                 vertices_enfileirados.append(vertices[vizinho - 1].numero)
-                gerar_imagem_do_grafo(matriz_adjacencia_exemplo, caminho_imagem_saida, vertice_atual.numero, vertices_enfileirados,
+                vertices_visitados.append(vertices[vizinho - 1].numero)
+                gerar_imagem_do_grafo(matriz_adjacencia_exemplo, caminho_imagem_saida, vertice_atual.numero, vertices_visitados,
                                       arestas_visitadas, aresta_escolhida)  # Gera imagem
-                window["-TEXT-"].update(f'Vertices: {vertices_enfileirados}')
+                window["-TEXT-"].update(f'Fila: {vertices_enfileirados}')
                 window['-IMAGE-'].update(f'{caminho_imagem}')
-
-                print ("Arvore pai ",vertice_atual.numero,"Filho ",vertices[vizinho - 1].numero)
-                colocar_arv(arvore,vertice_atual.numero,vertices[vizinho - 1].numero)
+                window.refresh()
+            else:
+                if vertices[vizinho - 1] in fila:
+                    aresta_escolhida = (vertice_atual.numero, vizinho)
+                    arestas_visitadas.append(aresta_escolhida)
+                    gerar_imagem_do_grafo(matriz_adjacencia_exemplo, caminho_imagem_saida, vertice_atual.numero, vertices_visitados,
+                                      arestas_visitadas, aresta_escolhida)  # Gera imagem
+                    window["-TEXT-"].update(f'Fila: {vertices_enfileirados}')
+                    window['-IMAGE-'].update(f'{caminho_imagem}')
+                    window.refresh()
 
                 window["-IMAGE2-"].update(filename="grafo/arvore.png")
                 window.refresh()
-                time.sleep(3)
 
-        print('------Fila:')
-        for ver in fila:
-            print(ver.numero, ver.marcado, ver.adjacencia)
-        print('-----------')
+        vertices_enfileirados.pop(0)
 
-        print(arestas_visitadas)
 
+        
+
+    gerar_imagem_do_grafo(matriz_adjacencia_exemplo, caminho_imagem_saida, vertice_atual.numero, vertices_visitados,
+                                      arestas_visitadas, aresta_escolhida)  # Gera imagem
+    window["-TEXT-"].update(f'Vertices: {vertices_enfileirados}')
+    window['-IMAGE-'].update(f'{caminho_imagem}')
+    window["-IMAGE2-"].update(filename="grafo/arvore.png")
+    window.refresh()
+    #time.sleep(1)
 
 
 # Exemplo: gerar uma imagem do grafo
@@ -180,27 +198,24 @@ matriz_adjacencia_exemplo = [
     [0, 0, 0, 0, 0, 0, 0, 1, 1, 0]
 ]
 
-gerar_imagem_do_grafo(matriz_adjacencia_exemplo, "grafo/grafo.png")
+caminho_imagem_saida = caminho_imagem = "grafo/grafo.png"
+sg.theme('Reddit')
 
+"""
 lista = matriz_adjacencia_para_lista(matriz_adjacencia_exemplo)
 calcular_grau(lista)
 
 for vertice, grau in lista.items():
     print(f'O vértice {vertice} possui grau {grau}')
-
-caminho_imagem_saida = caminho_imagem = "grafo/grafo.png"
-
-sg.theme('Reddit')
+"""
 
 arvore = nx.Graph()
-colocar_arv(arvore,None,8)
-# Exemplo: criar uma fila com tamanho variável de 8
-tamanho = 8
+
 vertices_enfileirados = list()
 layout = [[sg.Column([[sg.Image(key="-IMAGE-")]]),
           sg.Column([[sg.Image(key="-IMAGE2-")]])],
           [sg.Push(), sg.Button('Busca'), sg.Push()],
-          [sg.Text(f'Vertices: {vertices_enfileirados}', key="-TEXT-")]
+          [sg.Text(f'Fila: {vertices_enfileirados}', key="-TEXT-")]
           ]
 
 window = sg.Window('Busca em Largura', layout, resizable=True, finalize=True)
@@ -220,108 +235,3 @@ while True:
     if event == 'Busca':
         buscar_em_largura(None,arvore)
         window.Refresh()
-        
-        """
-        # Minha versão da busca em largura
-        fila = list()
-        vertices = list()
-
-        # Cria um nó para todos os vértices e aloca todos em uma lista
-        arestas = gerar_imagem_do_grafo(matriz_adjacencia_exemplo, caminho_imagem_saida)
-        num_vertices = 1
-        for v in arestas:
-            novo_no = Vertice(num_vertices)
-            num_vertices = num_vertices + 1
-            vertices.append(novo_no)
-
-        # Determina toda a vizinhança dos vértices
-        for v in vertices:
-            for n in arestas:
-                if v.numero in n:
-                    if n[0] == v.numero and n[1] not in v.adjacencia:
-                        v.adjacencia.append(n[1])
-                    elif n[1] == v.numero and n[0] not in v.adjacencia:
-                        v.adjacencia.append(n[0])
-
-        # Seja v o primeiro elemento
-        primeiro_vertice = 1
-        fila.append(vertices[primeiro_vertice - 1])
-        vertices[primeiro_vertice - 1].marcado = True
-
-        while fila:
-            for vizinho in vertices[primeiro_vertice - 1].adjacencia:  # Para a vizinhança de v
-                if not vertices[vizinho - 1].marcado:  # Se w não estiver marcado
-                    aresta_escolhida = (vertices[primeiro_vertice - 1].numero, vizinho)  # Visitar (v, w)
-                    vertices[vizinho - 1].marcado = True  # Marcar w
-                    fila.append(vertices[vizinho - 1])  # Inserir w em Q
-
-                    print(vertices[vizinho - 1].numero, vertices[vizinho - 1].marcado, vertices[vizinho - 1].adjacencia)
-                else:
-                    if vertices[vizinho - 1] in fila:  # Se w em Q
-                        aresta_escolhida = (vertices[primeiro_vertice - 1].numero, vizinho)  # Visitar (v, w)
-
-            gerar_imagem_do_grafo(matriz_adjacencia_exemplo, caminho_imagem_saida, None,aresta_escolhida)  # Gera imagem
-            del fila[0]  # retirar v de Q
-
-            print('------Fila:')
-            for ver in range(0, len(fila)):
-                print(fila[ver].numero, fila[ver].marcado, fila[ver].adjacencia)
-            print('-----------')
-
-            arestas_visitada.append((1,3))
-            gerar_imagem_do_grafo(matriz_adjacencia_exemplo, caminho_imagem,arestas_visitada,(3,4))"""
-
-
-"""
-Algoritmo de busca em largura na implementação
-
-Data: Grafo G(V,E), conexo
-v = vértice, w = vizinho de v, A(v) = vizinhança de v, Q = fila
-
-#lembrando que a fila começara com o nó raiz antes de entrar no algoritmo
-
-while Fila != NULL faça:
-     for w pertecente a A(v) faça:
-        if w não marcado então:
-            visitar(v,w);
-            marcar(w);
-            inserir(w) em Q;
-            
-            criar nó(w) na árvore e definir v como seu pai e atribuir nível = variável
-        else 
-            if w pertence a fila então:
-                visitar (v,w) #! aresta de cruzamento
-
-                verificar nível dos nós verificar se v e w possuem o mesmo pai, pois cada situação gerará um tipo de aresta
-            end
-        end
-    end
-    retirar v de Q
-end
-
-
-
-Algoritmo de busca em largura
-
-Data: Grafo G(V,E), conexo
-v = vértice, w = vizinho de v, A(v) = vizinhança de v, Q = fila
-
-while Fila != NULL faça:
-     for w pertecente a A(v) faça:
-        if w não marcado então:
-            visitar(v,w);
-            marcar(w);
-            inserir(w) em Q;
-        else 
-            if w pertence a fila então:
-                visitar (v,w) #! aresta de cruzamento
-            end
-        end
-    end
-    retirar v de Q
-end
-
-OBSERVAÇÕES: se quando w for encontrado v não estiver na fila não será feito nada pois provavelmente
-já existe uma aresta ligando w e v, caso v esteja na lista será feito uma aresta, se ambos estiver no mesmo nível e ter o mesmo pai
-será uma aresta irmão se não tiver o mesmo pai será uma aresta primo e se não tiver no mesmo nível será uma aresta tio
-"""
