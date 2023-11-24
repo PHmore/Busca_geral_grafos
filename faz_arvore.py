@@ -63,7 +63,7 @@ def arvore_test():
             [sg.Text('Cor:'), sg.InputText(key='cor')],
             [sg.Button('OK')]]
 
-    window = sg.Window('Busca em Largura', layout, resizable=True, finalize=True)
+    window = sg.Window('Faz arv', layout, resizable=True, finalize=True)
 
     while True:
         event, values = window.read()

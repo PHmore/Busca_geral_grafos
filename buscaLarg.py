@@ -20,7 +20,6 @@ from Vertice import Vertice
 from funGrafo import *
 from lerGrafo import *
 from collections import deque
-
 import networkx as nx
 import matplotlib.pyplot as plt
 
@@ -73,10 +72,32 @@ def gerar_imagem_do_grafo(matriz_adjacencia, caminho_imagem, no_atual = None,no_
     plt.close()
     return arestas
 
-def colocar_arv (vertice):
-    print("O nó será colocado na árvore")
+def colocar_arv (arvore, pai, filho, cor = "k"):
+    if not arvore.has_node(filho):
+        arvore.add_node(filho)
+    if arvore.has_node(pai):
+        arvore.add_edge(pai, filho, color=cor)
+    else:
+        print("Erro: O nó pai não existe na árvore.")
+        arvore.add_node(filho)
+        print("Portanto o nó foi adicionado como filho")
 
-def buscar_em_largura(vertice_inicial=None):
+
+    # Converter para um grafo PyGraphviz
+    G = nx.nx_agraph.to_agraph(arvore)
+
+    # Configuração de tamanho para nós e arestas
+    G.graph_attr.update(rankdir='TB')
+    G.node_attr.update({'style': 'filled', 'shape': 'circle', 'width': '0.1', 'height': '0.1'})  # Ajuste de tamanho dos nós
+    G.edge_attr.update({'penwidth': '3.0'})  # Ajuste de largura das arestas
+
+    # Layout e geração da imagem com Graphviz
+    G.layout(prog='dot')
+        
+    G.draw('arvore.png')
+    return arvore
+
+def buscar_em_largura(vertice_inicial=None,arvore = None):
     global vertices_enfileirados
     vertices = list()
     arestas_visitadas = list()
@@ -99,9 +120,10 @@ def buscar_em_largura(vertice_inicial=None):
                     v.adjacencia.append(n[0])
 
     # Seja v o primeiro elemento
-    primeiro_vertice = 1
+    primeiro_vertice = 8
     fila = deque([vertices[primeiro_vertice - 1]])
     vertices[primeiro_vertice - 1].marcado = True
+    colocar_arv(arvore,None,primeiro_vertice)
 
     while fila:
         vertice_atual = fila.popleft()
@@ -118,6 +140,11 @@ def buscar_em_largura(vertice_inicial=None):
                                       arestas_visitadas, aresta_escolhida)  # Gera imagem
                 window["-TEXT-"].update(f'Vertices: {vertices_enfileirados}')
                 window['-IMAGE-'].update(f'{caminho_imagem}')
+
+                print ("Arvore pai ",vertice_atual.numero,"Filho ",vertices[vizinho - 1].numero)
+                colocar_arv(arvore,vertice_atual.numero,vertices[vizinho - 1].numero)
+
+                window["-IMAGE2-"].update(filename="arvore.png")
                 window.refresh()
                 time.sleep(3)
 
@@ -128,12 +155,6 @@ def buscar_em_largura(vertice_inicial=None):
 
         print(arestas_visitadas)
 
-    gerar_imagem_do_grafo(matriz_adjacencia_exemplo, caminho_imagem_saida, vertice_atual.numero, None,
-                                      arestas_visitadas, aresta_escolhida)  # Gera imagem
-    window["-TEXT-"].update(f'Vertices: {vertices_enfileirados}')
-    window['-IMAGE-'].update(f'{caminho_imagem}')
-    window.refresh()
-    #time.sleep(1)
 
 
 # Exemplo: gerar uma imagem do grafo
@@ -161,11 +182,13 @@ for vertice, grau in lista.items():
 caminho_imagem_saida = caminho_imagem = "grafo/grafo.png"
 sg.theme('Reddit')
 
+arvore = nx.Graph()
 
 # Exemplo: criar uma fila com tamanho variável de 8
 tamanho = 8
 vertices_enfileirados = list()
-layout = [[sg.Image(key="-IMAGE-")],
+layout = [[sg.Column([[sg.Image(key="-IMAGE-")]]),
+          sg.Column([[sg.Image(key="-IMAGE2-")]])],
           [sg.Push(), sg.Button('Busca'), sg.Push()],
           [sg.Text(f'Vertices: {vertices_enfileirados}', key="-TEXT-")]
           ]
@@ -174,6 +197,7 @@ window = sg.Window('Busca em Largura', layout, resizable=True, finalize=True)
 
 while True:
     window["-IMAGE-"].update(filename=caminho_imagem)
+    window["-IMAGE2-"].update(filename="grafo/arvore.png")
     event, values = window.read()
 
     if event == sg.WIN_CLOSED or event == 'Exit':
@@ -184,7 +208,7 @@ while True:
         window.Refresh()
 
     if event == 'Busca':
-        buscar_em_largura()
+        buscar_em_largura(None,arvore)
         window.Refresh()
         
         """
