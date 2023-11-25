@@ -1,6 +1,4 @@
 import networkx as nx
-import matplotlib.pyplot as plt
-import time
 import PySimpleGUI as sg
 
 """
@@ -24,6 +22,7 @@ def adicionar_filho(arvore, pai, filho, cor, nome_imagem):
     return arvore
 """
 
+
 def adicionar_filho(arvore, pai, filho, cor):
     if not arvore.has_node(filho):
         arvore.add_node(filho)
@@ -33,7 +32,6 @@ def adicionar_filho(arvore, pai, filho, cor):
         print("Erro: O nó pai não existe na árvore.")
         arvore.add_node(filho)
         print("Portanto o nó foi adicionado como filho")
-
 
     # Converter para um grafo PyGraphviz
     G = nx.nx_agraph.to_agraph(arvore)
@@ -55,7 +53,6 @@ def arvore_test():
     arvore = nx.Graph()
 
     # Adicionar um nó raiz (neste caso, o vértice 1)
-
 
     layout = [[sg.Image(key="-IMAGE-")],
             [sg.Text('Pai:'), sg.InputText(key='pai')],

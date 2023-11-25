@@ -192,16 +192,13 @@ def buscar_em_largura(window, caminho_imagem, matriz_adjacencia, vertice_inicial
                 elif n[1] == v.numero and n[0] not in v.adjacencia:
                     v.adjacencia.append(n[0])
 
-    # Seja v o primeiro elemento
-    # Talvez modificar pois está contando que os vértices serão enumerados e não nomeado
-    primeiro_vertice = vertice_inicial
-
     # Cria e insere o vértice inicial na fila duplamente encadeada e na arvóre
-    fila = deque([vertices[primeiro_vertice]])
-    vertices[primeiro_vertice].marcado = True
-    vertices_enfileirados.append(vertices[primeiro_vertice].numero)
-    vertices_visitados.append(vertices[primeiro_vertice].numero)
-    colocar_arv(arvore, None, primeiro_vertice)
+    fila = deque([vertices[vertice_inicial]])
+    vertices[vertice_inicial].marcado = True
+    vertices[vertice_inicial].nivel_na_arvore = 1  # Vértice raiz da árvore de busca
+    vertices_enfileirados.append(vertices[vertice_inicial].numero)
+    vertices_visitados.append(vertices[vertice_inicial].numero)
+    colocar_arv(arvore, None, vertice_inicial)
 
     # Enquanto existir a fila
     while fila:
@@ -241,6 +238,10 @@ def buscar_em_largura(window, caminho_imagem, matriz_adjacencia, vertice_inicial
                     arestas_visitadas.append(aresta_escolhida)
 
                     colocar_arv(arvore, vertice_atual.numero, vertices[vizinho].numero, "orange")
+                    for c in vertices:
+                        print(c.nivel_na_arvore)
+
+
                     # ! Aresta Especial
                     # verificar nível dos nós e verificar se v e w possuem o mesmo pai, pois cada situação gerará um tipo de aresta
                     """
@@ -316,7 +317,8 @@ def interface_buscaLarg(grafo):
               [sg.Push(), sg.Text('Legenda de arestas:'), sg.Push()],
               [sg.Text('', background_color='green'), sg.Text('Em processo de visita ', pad=(0, 0)),
                sg.Text('', background_color='red'), sg.Text('Visitadas ', pad=(0, 0)),
-               sg.Text('', background_color='orange'), sg.Text('Primo ', pad=(0, 0))],
+               sg.Text('', background_color='orange'), sg.Text('Primo ', pad=(0, 0)),
+               sg.Text('', background_color='black'), sg.Text('De árvore ', pad=(0, 0))],
               [sg.Push(), sg.Text('Legenda de vértices:'), sg.Push()],
               [sg.Text('', background_color='green'), sg.Text('Em processo de visita ', pad=(0, 0)),
                sg.Text('', background_color='red'), sg.Text('Totalmente explorados ', pad=(0, 0))],
