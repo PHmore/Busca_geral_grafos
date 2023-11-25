@@ -8,10 +8,13 @@ from buscaLarg import interface_buscaLarg
 # ! Exibir e mostrar opções doq fazer com o grafo
 
 #! Resolver problema do carregamento inicial de imagens e quando não existem imagens
+#! Necessário rever o uso de vertices infileirados pois o mesmo precisa existir
+
 def main():
     # Caminho predefinido da imagem
     caminho_imagem = "grafo/grafo.png"
     grafo_selecionado = interface_lerGrafo()
+    sg.theme('Reddit')
 
     # Layout da interface
     layout = [
