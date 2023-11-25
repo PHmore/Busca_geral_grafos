@@ -229,7 +229,7 @@ def buscar_em_largura(window, caminho_imagem, matriz_adjacencia, vertice_inicial
                 window['-IMAGE-'].update(f'{caminho_imagem}')
                 window['-IMAGE2-'].update(f'{"grafo/arvore.png"}')
                 window.refresh()
-                time.sleep(1)
+                time.sleep(0.5)
             else:
                 # Se estiver marcado e estiver na fila
                 if vertices[vizinho] in fila:
@@ -275,7 +275,7 @@ def buscar_em_largura(window, caminho_imagem, matriz_adjacencia, vertice_inicial
                     window['-IMAGE-'].update(f'{caminho_imagem}')
                     window["-IMAGE2-"].update(filename="grafo/arvore.png")
                     window.refresh()
-                    time.sleep(1)
+                    time.sleep(0.5)
         # Remove da fila
         vertices_enfileirados.pop(0)
         window["-TEXT-"].update(f'Fila: {vertices_enfileirados}')
@@ -327,7 +327,8 @@ def interface_buscaLarg(grafo):
                sg.Push(), sg.Button('Sair'), sg.Push()],
               ]
 
-    window = sg.Window('Busca em Largura', layout, resizable=True, finalize=True)
+    window = sg.Window('Busca em Largura', layout, resizable=True, finalize=True, auto_size_buttons=True,
+                       auto_size_text=True)
 
     while True:
         event, values = window.read()

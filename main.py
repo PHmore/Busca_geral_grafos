@@ -2,7 +2,6 @@ import PySimpleGUI as sg
 
 # ! Gera o grafo e o salva como imagem
 from lerGrafo import interface_lerGrafo
-from lerGrafo import gerar_imagem_do_grafo
 from buscaLarg import interface_buscaLarg
 
 
@@ -15,13 +14,13 @@ def main():
     # Layout da interface
     layout = [
         [sg.Image(filename=caminho_imagem,key="-IMAGE-")],
-        [sg.Push(), sg.Button('Verificar se é conexo',size=(20, 1), button_color=('white', 'DarkGreen')),
-         sg.Push(), sg.Button('Aplicar busca em largura',size=(20, 1), button_color=('white', 'DarkGreen')),
-         sg.Push(), sg.Button('Mostrar bipartição do grafo',size=(20, 1),
+        [sg.Push(), sg.Button('Verificar se é conexo', size=(20, 1), button_color=('white', 'DarkGreen')),
+         sg.Push(), sg.Button('Aplicar busca em largura', size=(20, 1), button_color=('white', 'DarkGreen')),
+         sg.Push(), sg.Button('Mostrar bipartição do grafo', size=(20, 1),
                               button_color=('white', 'DarkGreen')), sg.Push()],
         [sg.Push()],
-        [sg.Push(), sg.Button('Escolher outro grafo',size=(20, 1), button_color=('white', 'DarkBlue')), sg.Push()],
-        [sg.Push(), sg.Button('Sair',size=(20, 1), button_color=('white', 'DarkRed')), sg.Push()]
+        [sg.Push(), sg.Button('Escolher outro grafo', size=(20, 1), button_color=('white', 'DarkBlue')), sg.Push()],
+        [sg.Push(), sg.Button('Sair', size=(20, 1), button_color=('white', 'DarkRed')), sg.Push()]
     ]
 
     # Criar a janela
@@ -35,6 +34,7 @@ def main():
             print("Será feita " ,event)
 
         if event == 'Aplicar busca em largura':
+
             interface_buscaLarg(grafo_selecionado)
 
         if event == 'Mostrar bipartição do grafo':
