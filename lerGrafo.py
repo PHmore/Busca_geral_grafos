@@ -37,8 +37,9 @@ def matriz_adjacencia_para_lista(matriz):
 
     return lista_adjacencia
 
-def gerar_imagem_do_grafo(matriz_adjacencia, aresta_pintada=None):
-    grafo = matriz_adjacencia
+def gerar_imagem_do_grafo(lista_adjacencia, aresta_pintada=None):
+    grafo = matriz_adjacencia_para_lista(lista_adjacencia)
+
 
     # Criar um objeto do tipo Grafo não direcionado (Graph) do NetworkX
     grafo_networkx = nx.Graph()
@@ -90,7 +91,8 @@ def interface_lerGrafo ():
             break
 
     window.close()
-    matriz_selecionada = matriz_adjacencia_para_lista(matriz_selecionada)
+    #matriz_selecionada = matriz_adjacencia_para_lista(matriz_selecionada)
+    gerar_imagem_do_grafo(matriz_selecionada,None)
     return matriz_selecionada
 
 """
