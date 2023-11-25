@@ -22,19 +22,10 @@ def calcular_grau(grafo):
     return grau
 
 
-# Exemplo de um grafo representado por lista de adjacência
-grafo_exemplo = {
-    'A': ['B', 'C'],
-    'B': ['A', 'C'],
-    'C': ['A', 'B', 'D'],
-    'D': ['C']
-}
 
-graus = calcular_grau(grafo_exemplo)
 
 # Exibir o grau de cada vértice
-for vertice, grau in graus.items():
-    print(f'O vértice {vertice} possui grau {grau}')
+
 
 # Aplicar busca em largura
 
@@ -63,7 +54,7 @@ def calcular_grau_vertice(matriz_adjacencia):
             if matriz_adjacencia[i][j] == 1:
                 grau += 1
         graus.append(grau)
-
+    print(graus)
     return graus
 
 # Exemplo de uso
@@ -80,6 +71,72 @@ graus = calcular_grau_vertice(matriz_adjacencia)
 for i, grau in enumerate(graus):
     print(f"O vértice {i+1} tem grau {grau}.")
 
+    
 
+
+def dfs(grafo, vertice, visitados):
+    visitados.add(vertice)
+    for vizinho in grafo[vertice]:
+        if vizinho not in visitados:
+            dfs(grafo, vizinho, visitados)
+
+def grafo_desconexo(grafo):
+    visitados = set()
+    componente = 0
+
+    for vertice in grafo:
+        if vertice not in visitados:
+            componente += 1
+            dfs(grafo, vertice, visitados)
+
+    return componente > 1
+
+# Exemplo de representação de um grafo como dicionário de adjacências
+grafo_exemplo = {
+    1: [2, 3],
+    2: [1],
+    3: [1],
+    4: [5],
+    5: [4]
+}
+
+if grafo_desconexo(grafo_exemplo):
+    print("O grafo é desconexo.")
+else:
+    print("O grafo é conexo.")
+
+"""
+
+"""
+def dfs(grafo, vertice, visitados):
+    visitados.add(vertice)
+    for vizinho in grafo[vertice]:
+        if vizinho not in visitados:
+            dfs(grafo, vizinho, visitados)
+
+def grafo_desconexo(grafo):
+    visitados = set()
+    componente = 0
+
+    for vertice in grafo:
+        if vertice not in visitados:
+            componente += 1
+            dfs(grafo, vertice, visitados)
+
+    return componente > 1
+
+# Exemplo de representação de um grafo como lista de adjacência
+grafo_exemplo = {
+    1: [2, 3],
+    2: [1],
+    3: [1],
+    4: [5],
+    5: [4]
+}
+
+if grafo_desconexo(grafo_exemplo):
+    print("O grafo é desconexo.")
+else:
+    print("O grafo é conexo.")
 
 """

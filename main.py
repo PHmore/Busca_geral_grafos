@@ -3,16 +3,22 @@ import PySimpleGUI as sg
 # ! Gera o grafo e o salva como imagem
 from lerGrafo import interface_lerGrafo
 from lerGrafo import gerar_imagem_do_grafo
+from buscaLarg import interface_buscaLarg
 
 # ! Exibir e mostrar opções doq fazer com o grafo
+
+#! Resolver problema do carregamento inicial de imagens e quando não existem imagens
+#! Necessário rever o uso de vertices infileirados pois o mesmo precisa existir
+
 def main():
     # Caminho predefinido da imagem
     caminho_imagem = "grafo/grafo.png"
-    interface_lerGrafo()
+    grafo_selecionado = interface_lerGrafo()
+    sg.theme('Reddit')
 
     # Layout da interface
     layout = [
-        [sg.Image(key="-IMAGE-")],
+        [sg.Image(filename=caminho_imagem,key="-IMAGE-")],
         [sg.Push(), sg.Button('Verificar se é conexo',size=(20, 1), button_color=('white', 'DarkGreen')),
          sg.Push(), sg.Button('Aplicar busca em largura',size=(20, 1), button_color=('white', 'DarkGreen')),
          sg.Push(), sg.Button('Mostrar bipartição do grafo',size=(20, 1),
@@ -24,8 +30,6 @@ def main():
 
     # Criar a janela
     window = sg.Window("Exibir Imagem", layout, resizable=True, finalize=True)
-
-    window["-IMAGE-"].update(filename=caminho_imagem)
     while True:
         event, values = window.read()
         if event == sg.WIN_CLOSED:
@@ -35,16 +39,16 @@ def main():
             print("Será feita " ,event)
 
         if event == 'Aplicar busca em largura':
-            print("Será feita " ,event)
+            interface_buscaLarg(grafo_selecionado)
 
         if event == 'Mostrar bipartição do grafo':
             print("Será feita " ,event)
 
         if event == 'Escolher outro grafo':
             #mudar grafo
-            matriz_adjacencia_exemplo = interface_lerGrafo()
-            gerar_imagem_do_grafo(matriz_adjacencia_exemplo, "grafo/grafo.png")
+            grafo_selecionado = interface_lerGrafo()
             window["-IMAGE-"].update(filename=caminho_imagem)
+            window.refresh()
 
         if event == 'Sair':
             break

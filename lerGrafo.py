@@ -1,7 +1,5 @@
 import PySimpleGUI as sg
-import networkx as nx
-import matplotlib.pyplot as plt
-
+from buscaLarg import gerar_imagem_do_grafo
 
 def ler_matrizes_arquivo(caminho_arquivo):
     matrizes = []
@@ -24,44 +22,6 @@ def ler_matrizes_arquivo(caminho_arquivo):
             matrizes.append(matriz_atual)
 
     return matrizes
-
-def matriz_adjacencia_para_lista(matriz):
-    lista_adjacencia = {}
-
-    for i in range(len(matriz)):
-        vizinhos = []
-        for j in range(len(matriz[i])):
-            if matriz[i][j] == 1:
-                vizinhos.append(j)  # Adiciona o vértice 'j' como vizinho de 'i'
-        lista_adjacencia[i] = vizinhos  # Adiciona a lista de vizinhos ao vértice 'i'
-
-    return lista_adjacencia
-
-def gerar_imagem_do_grafo(matriz_adjacencia, aresta_pintada=None):
-    grafo = matriz_adjacencia
-
-    # Criar um objeto do tipo Grafo não direcionado (Graph) do NetworkX
-    grafo_networkx = nx.Graph()
-
-    # Adicionar as arestas com base na lista de adjacência
-    for vertice, vizinhos in grafo.items():
-        for vizinho in vizinhos:
-            grafo_networkx.add_edge(vertice, vizinho)
-
-    # Adicionar vértices desconexos explicitamente
-    for vertice in grafo:
-        if not grafo[vertice]:  # Verifica se o vértice não possui vizinhos
-            grafo_networkx.add_node(vertice)
-
-    # Plotar o grafo com um layout circular
-    pos = nx.spring_layout(grafo_networkx)  # Define a posição dos nós para um layout circular
-    nx.draw(grafo_networkx, pos, with_labels=True, node_size=300, node_color='skyblue', font_weight='bold')
-    plt.title('Grafo a partir de Lista de Adjacência (Layout Circular)')
-
-    # Salvar o gráfico como uma imagem
-    plt.savefig('grafo/grafo.png')  # Salva o gráfico como um arquivo PNG
-    plt.close()
-
 
 def interface_lerGrafo ():
     # Leitura das matrizes
@@ -90,19 +50,6 @@ def interface_lerGrafo ():
             break
 
     window.close()
-    matriz_selecionada = matriz_adjacencia_para_lista(matriz_selecionada)
+    #matriz_selecionada = matriz_adjacencia_para_lista(matriz_selecionada)
+    gerar_imagem_do_grafo(matriz_selecionada,None)
     return matriz_selecionada
-
-"""
-Talvez já se deva criar a imagem do grafo nesse arquivo
-
-Para facilitar retornar como 
-
-grafo_exemplo = {
-    'A': ['B', 'C'],
-    'B': ['A', 'C'],
-    'C': ['A', 'B', 'D'],
-    'D': ['C']
-}
-
-"""
