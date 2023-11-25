@@ -5,10 +5,6 @@ from lerGrafo import interface_lerGrafo
 from lerGrafo import gerar_imagem_do_grafo
 from buscaLarg import interface_buscaLarg
 
-# ! Exibir e mostrar opções doq fazer com o grafo
-
-#! Resolver problema do carregamento inicial de imagens e quando não existem imagens
-#! Necessário rever o uso de vertices infileirados pois o mesmo precisa existir
 
 def main():
     # Caminho predefinido da imagem
@@ -45,7 +41,6 @@ def main():
             print("Será feita " ,event)
 
         if event == 'Escolher outro grafo':
-            #mudar grafo
             grafo_selecionado = interface_lerGrafo()
             window["-IMAGE-"].update(filename=caminho_imagem)
             window.refresh()

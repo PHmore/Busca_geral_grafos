@@ -3,4 +3,5 @@ class Vertice:
         self.marcado = False
         self.adjacencia = list()
         self.numero = numero_vertice
+        self.nivel_na_arvore = 0
 
