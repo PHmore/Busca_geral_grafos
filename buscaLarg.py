@@ -14,7 +14,6 @@ import time
 
 # ! Gera o grafo e o salva como imagem
 import networkx as nx
-import matplotlib.pyplot as plt
 import PySimpleGUI as sg
 from Vertice import Vertice
 from funGrafo import *
