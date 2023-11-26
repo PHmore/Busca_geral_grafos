@@ -51,7 +51,8 @@ def calcular_grau_vertice(matriz_adjacencia):
         dados_tabela.append([f'{idx}', grau])
 
     dados_tabela.sort(key=lambda x: x[1], reverse=True)
-    dados_tabela = dados_tabela[:3]
+    #Retornará os 3 principais vértices
+    #dados_tabela = dados_tabela[:3]
     return dados_tabela
 
 
@@ -324,31 +325,40 @@ def interface_buscaLarg(grafo):
     """
 
     arvore = nx.Graph()
-
+    colocar_arv(arvore,None,0)
+    arvore.clear()
     vertices_enfileirados = list()
     layout = [
     [
-        sg.Text(f'Fila: {vertices_enfileirados}', key="-TEXT-", font=("Ubuntu", 20))
-    ],
-    [
         sg.Column([
-            [sg.Image(filename=caminho_imagem, key="-IMAGE-")]
+            [sg.Image(filename=caminho_imagem, key="-IMAGE-")],
+            [
+            sg.Text(f'Fila: {vertices_enfileirados}', key="-TEXT-", font=("Ubuntu", 20))
+            ],
+            [sg.Text('Legenda de vértices:')],
+            [
+                sg.Column([
+                    [sg.Text('', background_color='green'), sg.Text('Em processo de visita ', pad=(0, 0))],
+                    [sg.Text('', background_color='skyblue'), sg.Text('Marcado ', pad=(0, 0))],
+                    [sg.Text('', background_color='red'), sg.Text('Totalmente explorados ', pad=(0, 0))]
+                ]),
+                sg.Column([
+                    [sg.Text('Legenda de arestas:')],
+                    [sg.Text('', background_color='green'), sg.Text('Em processo de visita ', pad=(0, 0))],
+                    [sg.Text('', background_color='red'), sg.Text('Visitadas ', pad=(0, 0))]
+                ])
+            ]
         ]),
         sg.VSeparator(),
         sg.Column([
             [sg.Text(f'Arvore', font=("Ubuntu", 20))],
             [sg.Text(''), sg.Text(''),sg.Text(''),sg.Text('')],
             [sg.Text('Legenda de arestas:')],
-            [sg.Text('', background_color='green'), sg.Text('Em processo de visita ', pad=(0, 0))],
-            [sg.Text('', background_color='red'), sg.Text('Visitadas ', pad=(0, 0))],
             [sg.Text('', background_color='black'), sg.Text('Pai ', pad=(0, 0))],
             [sg.Text('', background_color='DarkBlue'), sg.Text('Irmão ', pad=(0, 0))],
             [sg.Text('', background_color='DarkMagenta'), sg.Text('Tio ', pad=(0, 0))],
             [sg.Text('', background_color='orange'), sg.Text('Primo ', pad=(0, 0))],
-            [sg.Text(''), sg.Text('')],
-            [sg.Text('Legenda de vértices:')],
-            [sg.Text('', background_color='green'), sg.Text('Em processo de visita ', pad=(0, 0))],
-            [sg.Text('', background_color='red'), sg.Text('Totalmente explorados ', pad=(0, 0))]
+            [sg.Text(''), sg.Text('')]
             
         ], vertical_alignment='center'),
         sg.Column([
