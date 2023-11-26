@@ -34,7 +34,6 @@ import pygraphviz as pgv
 
 # ! Estudar o uso da biblioteca que gera a imagem da árvore para gerar a imagem do grafo
 
-
 def calcular_grau_vertice(matriz_adjacencia):
     graus = []
     num_vertices = len(matriz_adjacencia)
@@ -89,6 +88,7 @@ def gerar_imagem_do_grafo(matriz_adjacencia, caminho_imagem, no_atual=None, no_v
     G_pgv = pgv.AGraph(strict=True, directed=False, rankdir='BT')
     #True size defini que o tamanho real do nó é no minimo 0.0
     G_pgv.node_attr.update({'style': 'filled', 'shape': 'circle', 'width': '0.44', 'height': '0.44','fixedsize' : 'True'})
+
     arestas = []
 
     for i in range(len(matriz_adjacencia)):
@@ -168,10 +168,9 @@ def colocar_arv (arvore, pai, filho, cor = "black"):
     G.draw('grafo/arvore.png')
     return arvore
 
-def buscar_em_largura(window,caminho_imagem,matriz_adjacencia, vertice_inicial=None,arvore = None, ):
+def buscar_em_largura(window,caminho_imagem,matriz_adjacencia, vertices_visitados, vertice_inicial=None,arvore = None, ):
     #Declarando variáveis
-    
-    vertices_visitados = list ()
+    arestas = []
     vertices = list()
     arestas_visitadas = list()
 
@@ -308,8 +307,42 @@ def buscar_em_largura(window,caminho_imagem,matriz_adjacencia, vertice_inicial=N
     window.refresh()
     # time.sleep(1)
 
+    G_conn = isConnect(vertices_visitados,arestas)
+    if (not G_conn):
+        print ("O grafo é conexo")
+    else:
+        print ("O grafo possui as componente ",G_conn," Desconexas")
+        buscar_em_largura(window, caminho_imagem, matriz_adjacencia, vertices_visitados, G_conn[0], arvore)
+
+def isConnect (vertices_comp,arestas_totais):
+
+    # Inicializa um conjunto vazio para armazenar os vértices
+    vertices = set()
+
+    print("Todas arestas",arestas_totais)
+
+    # Percorre cada aresta e adiciona seus vértices únicos ao conjunto 'vertices'
+    for aresta in arestas_totais:
+        vertices.update(aresta)
+
+    # Exibe os vértices únicos presentes nas arestas
+    print("Vértices únicos:", vertices)
+    vertices_comp = set(vertices_comp)
+    resultado = vertices - vertices_comp 
+    print ("Resultado", resultado)
+    print(vertices, vertices_comp)
+    return list(resultado)
+
+
+#! Mudar a direção dos dados do grafo para sua horizontal, pois os grafos tendem a ser desenhados verticalmente
+#! Ocupando grande parte da janela
 def interface_buscaLarg(grafo):
     global vertices_enfileirados
+
+    #! Variáveis para guardar os dados se necessário
+    global arestas_pai
+    global arestas_primo
+    global arestas_tio
 
     matriz_adjacencia = grafo
 
@@ -327,7 +360,10 @@ def interface_buscaLarg(grafo):
     arvore = nx.Graph()
     colocar_arv(arvore,None,0)
     arvore.clear()
+
     vertices_enfileirados = list()
+    vertices_visitados = list ()
+
     layout = [
     [
         sg.Column([
@@ -390,7 +426,9 @@ def interface_buscaLarg(grafo):
 
         if event == 'Busca':
             vertice_inicial = vert_inicial(matriz_adjacencia)
-            buscar_em_largura(window, caminho_imagem, matriz_adjacencia, vertice_inicial, arvore)
+            buscar_em_largura(window, caminho_imagem, matriz_adjacencia, vertices_visitados, vertice_inicial, arvore)
+            
+
             #limpa a arvore para se for feita outra busca não usar a mesma arvore
             arvore.clear()
             # talvez retorna o vértice o qual a bipartição é nula

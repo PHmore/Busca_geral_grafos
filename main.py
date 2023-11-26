@@ -10,6 +10,11 @@ from buscaLarg import interface_buscaLarg
 #! Resolver problema do carregamento inicial de imagens e quando não existem imagens
 #! Necessário rever o uso de vertices infileirados pois o mesmo precisa existir
 
+#? Para encontrar bipartição no grafo apartir de uma aresta especial
+#? Pode se pegar igualar o nível dos vértices e subir a árvore até a aresta a,b possuirem o mesmo pai
+#? Fazer esse processo recolorindo os nós pelo caminho resultará em teoria em um ciclo impar
+#? Portanto tentar implementar posteriomente
+
 def main():
     # Caminho predefinido da imagem
     caminho_imagem = "grafo/grafo.png"
