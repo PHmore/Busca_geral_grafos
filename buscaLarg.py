@@ -336,6 +336,15 @@ def isConnect (vertices_comp,arestas_totais):
     print(vertices, vertices_comp)
     return list(resultado)
 
+#! Essa função pode recolorir a árvore ou o grafo ou ambos, acho interessante recolorir ambos
+#! Para recolorir o grafo primeiro será necessário colorir ó de gray e dps pode se usar duas cores uma pra cada conjunto
+#! A função pode ser feita simplesmente pintando os vértices vizinho de cor diferente dos vértices atuais
+#! Enquanto o ciclo impar pode ser pintado da mesma cor
+def isBipart (arvore, arestas_especiais):
+    if arestas_especiais is not None:
+        print("O grafo não é bipartido e um ciclo impar será pintado")
+    else:
+        print("O grafo é bipartido e a árvore será recolorido em 2 cores diferentes")
 
 #! Mudar a direção dos dados do grafo para sua horizontal, pois os grafos tendem a ser desenhados verticalmente
 #! Ocupando grande parte da janela
@@ -436,15 +445,8 @@ def interface_buscaLarg(grafo):
             arvore.clear()
             # talvez retorna o vértice o qual a bipartição é nula
             window.Refresh()
-        """
         if event == 'Mostrar bipartição':
-            __import__('os').remove('grafo/arvore.png')
-            #! Falta fazer com que o vértice inicial entre
-            #! Talvez remover tudo e deixar como antes
-            #! Focar em realizar a busca a grafos desconexos automaticamente
-            vertice_inicial = vert_inicial(matriz_adjacencia)
-            arvore.clear()
-            window.Refresh()
-        """
+            print("A bipartição será mostrada recolorindo a árvore")
+            #isBipart(arvore,arestas)
     window.close()
     return
