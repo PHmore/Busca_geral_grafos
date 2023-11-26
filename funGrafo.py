@@ -12,16 +12,6 @@ correspondentes a cada componente conexa que o grafo possuir
 '''
 
 
-# Será calculado o grau para que os 3 de maior grau sejam candidatos a raiz
-def calcular_grau(grafo):
-    grau = {}
-
-    for vertice, vizinhos in grafo.items():
-        grau[vertice] = len(vizinhos)
-
-    return grau
-
-
 
 
 # Exibir o grau de cada vértice
@@ -106,7 +96,7 @@ else:
     print("O grafo é conexo.")
 
 """
-
+#! Verifica se é desconexo por meio da busca em profundidade
 """
 def dfs(grafo, vertice, visitados):
     visitados.add(vertice)

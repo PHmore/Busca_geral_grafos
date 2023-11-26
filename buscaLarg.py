@@ -1,5 +1,8 @@
 # Aqui será feita a busca em largura OBS: A busca deve ser realizada mesmo que o usuário selecione a opção 3
 
+#!ERROS
+# Entender pq o grafo 8 não está realizando a 2 busca
+
 """
 6 – Caso o usuário selecione a opção “2” o programa deve perguntar: “Qual será o vértice raiz da
 busca?” e apresentar a listagem dos vértices candidatos; Na sequência deve-se ser apresentada a
@@ -23,16 +26,12 @@ import pygraphviz as pgv
 
 # ! Talvez seja interessante deixa escolher qualquer vértice pois se o grafo for desconexo ele gera duas arvores
 # ! Esse mesmo fator pode ser usado para mostrar as componentes desconexas por meio de arvores e
-# !usando set para cada componente e comporando a quantidade de vértices encontrados com a quantidade de nós totais
 
-# ! Verificar porque uma aresta verde permanece, e resolver para não gerar confusão na visualização
+# !usando set para cada componente e comporando a quantidade de vértices encontrados com a quantidade de nós totais
 
 # ! Tentar fazer com que sair no meio do programa não mostre a tela de morte
 
-# ! É totalmente viável usar apenas o gerar imagem que está sendo usado nessa função, pois a imagem é mais bonita
-# !,porém ser o grafo for desconexo com uma componente sendo um K1 a imagem do gerar dessa função não o mostra (Resolver)
 
-# ! Estudar o uso da biblioteca que gera a imagem da árvore para gerar a imagem do grafo
 
 def calcular_grau_vertice(matriz_adjacencia):
     graus = []
@@ -56,6 +55,7 @@ def calcular_grau_vertice(matriz_adjacencia):
 
 
 def vert_inicial(grafo):
+    sg.theme('Reddit')
     # Dados da tabela (vértices e graus)
     dados_tabela = calcular_grau_vertice(grafo)
 
@@ -210,6 +210,7 @@ def buscar_em_largura(window,caminho_imagem,matriz_adjacencia, vertices_visitado
 
         # Para cada vizinho
         for vizinho in vertice_atual.adjacencia:
+            print("Vizinho ",vizinho, "Verti adja", vertice_atual.adjacencia)
 
             # Se não tiver marcado
             if not vertices[vizinho].marcado:
@@ -248,10 +249,12 @@ def buscar_em_largura(window,caminho_imagem,matriz_adjacencia, vertices_visitado
                     #! Salvar conjunto de arestas e printar no terminal msm
 
                     #!Aresta irmão
+                    #! Salvar os vértices que o compõe pois por meio deles poderemos apresentar o ciclo impar
                     if (vertice_atual.numero_pai == vertices[vizinho].numero_pai):
                         print("Aresta irmão")
                         colocar_arv(arvore, vertice_atual.numero, vertices[vizinho].numero, "DarkBlue")
                     #!Aresta prima
+                    #! Salvar os vértices que o compõe pois por meio deles poderemos apresentar o ciclo impar
                     elif (vertice_atual.nivel_na_arvore == vertices[vizinho].nivel_na_arvore):
                         print("Aresta Prima")
                         colocar_arv(arvore, vertice_atual.numero, vertices[vizinho].numero, "orange")
@@ -404,7 +407,7 @@ def interface_buscaLarg(grafo):
     ],
     [sg.HSeparator()],
     [
-        sg.Push(), sg.Button('Mudar vertice inicial'), sg.Button('Busca'),
+        sg.Push(), sg.Button('Mostrar bipartição'), sg.Button('Busca'),
         sg.Button('Sair'), sg.Push()
     ]
     ]   
@@ -434,7 +437,7 @@ def interface_buscaLarg(grafo):
             # talvez retorna o vértice o qual a bipartição é nula
             window.Refresh()
         """
-        if event == 'Mudar vertice inicial':
+        if event == 'Mostrar bipartição':
             __import__('os').remove('grafo/arvore.png')
             #! Falta fazer com que o vértice inicial entre
             #! Talvez remover tudo e deixar como antes

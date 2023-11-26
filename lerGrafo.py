@@ -25,6 +25,7 @@ def ler_matrizes_arquivo(caminho_arquivo):
 
 def interface_lerGrafo ():
     # Leitura das matrizes
+    sg.theme('Reddit')
     caminho_do_arquivo = 'grafo/grafo.txt'
     matrizes = ler_matrizes_arquivo(caminho_do_arquivo)
 
