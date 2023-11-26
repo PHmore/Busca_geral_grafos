@@ -86,6 +86,7 @@ def vert_inicial(grafo):
 def gerar_imagem_do_grafo(matriz_adjacencia, caminho_imagem, no_atual=None, no_visitados=None, arestas_visitadas=None,
                           aresta_pintada=None):
     G_pgv = pgv.AGraph(strict=True, directed=False, rankdir='BT')
+    print(type(G_pgv))
     #True size defini que o tamanho real do nó é no minimo 0.0
     G_pgv.node_attr.update({'style': 'filled', 'shape': 'circle', 'width': '0.44', 'height': '0.44','fixedsize' : 'True'})
 
@@ -176,12 +177,13 @@ def buscar_em_largura(window,caminho_imagem,matriz_adjacencia, vertices_visitado
 
     #Obtem por meio da leitura do grafo as arestas
     arestas = gerar_imagem_do_grafo(matriz_adjacencia, caminho_imagem)
+    print (arestas)
 
     # Cria um nó para todos os vértices e aloca todos em uma lista
-    num_vertices = 0
-    for v in arestas:
-        novo_no = Vertice(num_vertices,-1)
-        num_vertices += 1
+    num_vertices = list()
+    for v in range(len(matriz_adjacencia)):
+        novo_no = Vertice(v,-1)
+        num_vertices.append(v)
         vertices.append(novo_no)
 
     # Determina toda a vizinhança dos vértices
@@ -190,9 +192,12 @@ def buscar_em_largura(window,caminho_imagem,matriz_adjacencia, vertices_visitado
             if v.numero in n:
                 if n[0] == v.numero and n[1] not in v.adjacencia:
                     v.adjacencia.append(n[1])
+                    print(v.adjacencia)
                 elif n[1] == v.numero and n[0] not in v.adjacencia:
                     v.adjacencia.append(n[0])
+                    print(v.adjacencia)
 
+    print(vertice_inicial)
     # Cria e insere o vértice inicial na fila duplamente encadeada e na arvóre
     fila = deque([vertices[vertice_inicial]])
     vertices[vertice_inicial].marcado = True
@@ -211,6 +216,7 @@ def buscar_em_largura(window,caminho_imagem,matriz_adjacencia, vertices_visitado
         # Para cada vizinho
         for vizinho in vertice_atual.adjacencia:
             print("Vizinho ",vizinho, "Verti adja", vertice_atual.adjacencia)
+            print(vizinho)
 
             # Se não tiver marcado
             if not vertices[vizinho].marcado:
@@ -262,23 +268,6 @@ def buscar_em_largura(window,caminho_imagem,matriz_adjacencia, vertices_visitado
                     else:
                         print("Aresta Tio")
                         colocar_arv(arvore, vertice_atual.numero, vertices[vizinho].numero, "DarkMagenta")
-                
-                    # verificar nível dos nós e verificar se v e w possuem o mesmo pai, pois cada situação gerará um tipo de aresta
-                    """
-                    Talvez seja bom para o nível fazer vértice.nivel = vertice.pai.vivel + 1, pois assim se manterá nivelado
-
-                    if(vertice.pai == vertice.vizinho.pai)
-                    {
-                    aresta irmão
-                    }
-                    else if (vertice.nivel == vertice.vizinho.nivel)
-                    {
-                    aresta de primo
-                    } else 
-                    {
-                    aresta de tio
-                    }
-                    """
 
                     gerar_imagem_do_grafo(matriz_adjacencia, caminho_imagem, vertice_atual.numero, vertices_visitados,
                                           arestas_visitadas, aresta_escolhida)  # Gera imagem
@@ -309,42 +298,66 @@ def buscar_em_largura(window,caminho_imagem,matriz_adjacencia, vertices_visitado
     window["-IMAGE2-"].update(filename="grafo/arvore.png")
     window.refresh()
     # time.sleep(1)
-
-    G_conn = isConnect(vertices_visitados,arestas)
+    isBipart(arvore,vertices)
+    G_conn = isConnect(vertices_visitados,num_vertices)
     if (not G_conn):
         print ("O grafo é conexo")
     else:
         print ("O grafo possui as componente ",G_conn," Desconexas")
         buscar_em_largura(window, caminho_imagem, matriz_adjacencia, vertices_visitados, G_conn[0], arvore)
 
-def isConnect (vertices_comp,arestas_totais):
+def isConnect (vertices_comp,vertices_totais):
 
-    # Inicializa um conjunto vazio para armazenar os vértices
-    vertices = set()
+    print("Todas vert",vertices_totais,vertices_comp)
 
-    print("Todas arestas",arestas_totais)
+    vertices_comp = set (vertices_comp)
+    vertices_totais = set (vertices_totais)
 
-    # Percorre cada aresta e adiciona seus vértices únicos ao conjunto 'vertices'
-    for aresta in arestas_totais:
-        vertices.update(aresta)
-
-    # Exibe os vértices únicos presentes nas arestas
-    print("Vértices únicos:", vertices)
-    vertices_comp = set(vertices_comp)
-    resultado = vertices - vertices_comp 
+    resultado = vertices_totais - vertices_comp 
     print ("Resultado", resultado)
-    print(vertices, vertices_comp)
+    print(vertices_totais, vertices_comp)
     return list(resultado)
 
 #! Essa função pode recolorir a árvore ou o grafo ou ambos, acho interessante recolorir ambos
 #! Para recolorir o grafo primeiro será necessário colorir ó de gray e dps pode se usar duas cores uma pra cada conjunto
 #! A função pode ser feita simplesmente pintando os vértices vizinho de cor diferente dos vértices atuais
 #! Enquanto o ciclo impar pode ser pintado da mesma cor
-def isBipart (arvore, arestas_especiais):
-    if arestas_especiais is not None:
+def isBipart (arvore, vertices, G_pgv = None):
+    if False:
         print("O grafo não é bipartido e um ciclo impar será pintado")
     else:
+        groupA = list()
+        groupB = list()
+
         print("O grafo é bipartido e a árvore será recolorido em 2 cores diferentes")
+        
+        def draw_nodes(nodes, color, G = G_pgv):
+            for node in nodes:
+                pgv_node = G.get_node(node)
+                pgv_node.attr['color'] = color
+
+        for v in vertices:
+            if v.numero not in groupA and v.numero not in groupB:
+                groupA.append(v.numero)
+                stack = [v.numero]
+
+                while stack:
+                    current = stack.pop()
+
+                    for adj in vertices[current].adjacencia:
+                        if adj not in groupA and adj not in groupB:
+                            # Adiciona aos grupos alternadamente
+                            if current in groupA:
+                                groupB.append(adj)
+                            else:
+                                groupA.append(adj)
+                            stack.append(adj)
+        
+        print("Grupo A : ",groupA,"Grupo B: ",groupB)
+        #draw_nodes(groupA,'orange',arvore)
+        #draw_nodes(groupA,'pink',arvore)
+        
+        
 
 #! Mudar a direção dos dados do grafo para sua horizontal, pois os grafos tendem a ser desenhados verticalmente
 #! Ocupando grande parte da janela
@@ -355,7 +368,7 @@ def interface_buscaLarg(grafo):
     global arestas_pai
     global arestas_primo
     global arestas_tio
-
+    global arestas_irmao
     matriz_adjacencia = grafo
 
     caminho_imagem = caminho_imagem = "grafo/grafo.png"
@@ -373,6 +386,10 @@ def interface_buscaLarg(grafo):
     colocar_arv(arvore,None,0)
     arvore.clear()
 
+    arestas_primo = list() 
+    arestas_tio = list()
+    arestas_pai = list()
+    arestas_irmao = list()
     vertices_enfileirados = list()
     vertices_visitados = list ()
 
@@ -447,6 +464,6 @@ def interface_buscaLarg(grafo):
             window.Refresh()
         if event == 'Mostrar bipartição':
             print("A bipartição será mostrada recolorindo a árvore")
-            #isBipart(arvore,arestas)
+            isBipart(arvore)
     window.close()
     return

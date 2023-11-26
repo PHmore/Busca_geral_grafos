@@ -22,6 +22,49 @@ correspondentes a cada componente conexa que o grafo possuir
 
 # Encontrar bipartição
 """
+class Vertice:
+    def __init__(self, numero, adjacencia):
+        self.numero = numero
+        self.adjacencia = adjacencia
+
+def verifica_bipartido(vertices):
+    groupA = set()
+    groupB = set()
+
+    for v in vertices:
+        if v not in groupA and v not in groupB:
+            groupA.add(v)
+            stack = [v]
+
+            while stack:
+                current = stack.pop()
+
+                for adj in vertices[current].adjacencia:
+                    if adj in groupA:
+                        return False  # Se um vértice adjacente já está em groupA, o grafo não é bipartido
+                    elif adj not in groupB:
+                        groupB.add(adj)
+                        stack.append(adj)
+
+    return True  # Se nenhum conflito for encontrado, o grafo é bipartido
+
+# Exemplo de uso:
+vertices = {
+    1: Vertice(1, [2, 3]),
+    2: Vertice(2, [1, 4]),
+    3: Vertice(3, [1, 4]),
+    4: Vertice(4, [2, 3])
+}
+
+resultado = verifica_bipartido(vertices)
+if resultado:
+    print("O grafo é bipartido.")
+else:
+    print("O grafo não é bipartido.")
+
+"""
+
+"""
 7 – Caso o grafo seja bipartido, a opção 3 deve apresentar a bipartição do grafo, caso ele não seja
 bipartido, esta opção deve informar que é impossível encontrar a bipartição porque o grafo não é
 bipartido, em seguida apresentar o ciclo ímpar que há no grafo
