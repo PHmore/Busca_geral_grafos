@@ -18,7 +18,6 @@ from funGrafo import *
 from lerGrafo import *
 from collections import deque
 import networkx as nx
-import matplotlib.pyplot as plt
 import pygraphviz as pgv
 
 
@@ -87,7 +86,8 @@ def vert_inicial(grafo):
 def gerar_imagem_do_grafo(matriz_adjacencia, caminho_imagem, no_atual=None, no_visitados=None, arestas_visitadas=None,
                           aresta_pintada=None):
     G_pgv = pgv.AGraph(strict=True, directed=False, rankdir='BT')
-    G_pgv.node_attr.update({'style': 'filled', 'shape': 'circle', 'width': '0.005', 'height': '0.005'})
+    #True size defini que o tamanho real do nó é no minimo 0.0
+    G_pgv.node_attr.update({'style': 'filled', 'shape': 'circle', 'width': '0.44', 'height': '0.44','fixedsize' : 'True'})
     arestas = []
 
     for i in range(len(matriz_adjacencia)):
@@ -141,15 +141,16 @@ def gerar_imagem_do_grafo(matriz_adjacencia, caminho_imagem, no_atual=None, no_v
     return arestas
 
 def colocar_arv (arvore, pai, filho, cor = "black"):
-    #! Depois tratar corretamente pois nem todo vértice é pai seria interessante nomear de no1 e no2 as entradas
-    if not arvore.has_node(filho):
+    #! Aresta especial
+    if arvore.has_node(pai) and arvore.has_node(filho):
+        arvore.add_edge(pai, filho, color=cor, constraint = False)
+    #! Aresta de arvore
+    elif not arvore.has_node(filho) and arvore.has_node(pai):
         arvore.add_node(filho)
-    if arvore.has_node(pai):
         arvore.add_edge(pai, filho, color=cor)
+    #! Nó inicial
     else:
-        print("Erro: nó pai não existe na árvore.")
         arvore.add_node(filho)
-        print("Portanto o nó foi adicionado como filho")
 
 
     # Converter para um grafo PyGraphviz
@@ -157,7 +158,7 @@ def colocar_arv (arvore, pai, filho, cor = "black"):
 
     # Configuração de tamanho para nós e arestas
     G.graph_attr.update(rankdir='TB')
-    G.node_attr.update({'style': 'filled', 'shape': 'circle', 'width': '0.01', 'height': '0.01','color':'skyblue'})  # Ajuste de tamanho dos nós
+    G.node_attr.update({'style': 'filled', 'shape': 'circle', 'width': '0.3', 'height': '0.3','fixedsize' : 'True' ,'color':'lightblue'})  # Ajuste de tamanho dos nós
     G.edge_attr.update({'penwidth': '3.0'})  # Ajuste de largura das arestas
 
     # Layout e geração da imagem com Graphviz
@@ -179,7 +180,7 @@ def buscar_em_largura(window,caminho_imagem,matriz_adjacencia, vertice_inicial=N
     # Cria um nó para todos os vértices e aloca todos em uma lista
     num_vertices = 0
     for v in arestas:
-        novo_no = Vertice(num_vertices)
+        novo_no = Vertice(num_vertices,-1)
         num_vertices += 1
         vertices.append(novo_no)
 
@@ -198,8 +199,10 @@ def buscar_em_largura(window,caminho_imagem,matriz_adjacencia, vertice_inicial=N
     vertices[vertice_inicial].nivel_na_arvore = 1  # Vértice raiz da árvore de busca
     vertices_enfileirados.append(vertices[vertice_inicial].numero)
     vertices_visitados.append(vertices[vertice_inicial].numero)
-    colocar_arv(arvore, None, vertice_inicial)
 
+    colocar_arv(arvore, None, vertice_inicial)
+    vertices[vertice_inicial].numero_pai = None
+    print(vertices[vertice_inicial].nivel_na_arvore)
     # Enquanto existir a fila
     while fila:
         # Toma-se o primeiro vértice da fila
@@ -219,10 +222,15 @@ def buscar_em_largura(window,caminho_imagem,matriz_adjacencia, vertice_inicial=N
                 fila.append(vertices[vizinho])
                 vertices_enfileirados.append(vertices[vizinho].numero)
                 vertices_visitados.append(vertices[vizinho].numero)
+
                 # Adiciona na árvore com aresta pai
                 colocar_arv(arvore, vertice_atual.numero, vertices[vizinho].numero)
-
+                vertices[vizinho].numero_pai = vertice_atual.numero
+                print("Numeros",vertices[vizinho].numero_pai,vertices[vizinho].numero)
+                vertices[vizinho].nivel_na_arvore = vertice_atual.nivel_na_arvore + 1
+                print("Niveis",vertices[vizinho].nivel_na_arvore,vertice_atual.nivel_na_arvore)
                 # criar nó(w) na árvore e definir v como seu pai e atribuir nível = variável
+
                 gerar_imagem_do_grafo(matriz_adjacencia, caminho_imagem, vertice_atual.numero, vertices_visitados,
                                       arestas_visitadas, aresta_escolhida)  # Gera imagem
                 window["-TEXT-"].update(f'Fila: {vertices_enfileirados}')
@@ -237,12 +245,21 @@ def buscar_em_largura(window,caminho_imagem,matriz_adjacencia, vertice_inicial=N
                     aresta_escolhida = (vertice_atual.numero, vizinho)
                     arestas_visitadas.append(aresta_escolhida)
 
-                    colocar_arv(arvore, vertice_atual.numero, vertices[vizinho].numero, "orange")
-                    for c in vertices:
-                        print(c.nivel_na_arvore)
+                    #! Salvar conjunto de arestas e printar no terminal msm
 
-
-                    # ! Aresta Especial
+                    #!Aresta irmão
+                    if (vertice_atual.numero_pai == vertices[vizinho].numero_pai):
+                        print("Aresta irmão")
+                        colocar_arv(arvore, vertice_atual.numero, vertices[vizinho].numero, "DarkBlue")
+                    #!Aresta prima
+                    elif (vertice_atual.nivel_na_arvore == vertices[vizinho].nivel_na_arvore):
+                        print("Aresta Prima")
+                        colocar_arv(arvore, vertice_atual.numero, vertices[vizinho].numero, "orange")
+                    #!Aresta Tio
+                    else:
+                        print("Aresta Tio")
+                        colocar_arv(arvore, vertice_atual.numero, vertices[vizinho].numero, "DarkMagenta")
+                
                     # verificar nível dos nós e verificar se v e w possuem o mesmo pai, pois cada situação gerará um tipo de aresta
                     """
                     Talvez seja bom para o nível fazer vértice.nivel = vertice.pai.vivel + 1, pois assim se manterá nivelado
@@ -290,7 +307,6 @@ def buscar_em_largura(window,caminho_imagem,matriz_adjacencia, vertice_inicial=N
     window.refresh()
     # time.sleep(1)
 
-
 def interface_buscaLarg(grafo):
     global vertices_enfileirados
 
@@ -310,22 +326,43 @@ def interface_buscaLarg(grafo):
     arvore = nx.Graph()
 
     vertices_enfileirados = list()
-    layout = [[sg.Text(f'Fila: {vertices_enfileirados}', key="-TEXT-", font=("Ubuntu", 20))],
-              [sg.Column([[sg.Image(filename=caminho_imagem, key="-IMAGE-")]]),
-               sg.Column([[sg.Image(filename="grafo/arvore.png", key="-IMAGE2-")]])],
-              [sg.HSeparator()],
-              [sg.Push(), sg.Text('Legenda de arestas:'), sg.Push()],
-              [sg.Text('', background_color='green'), sg.Text('Em processo de visita ', pad=(0, 0)),
-               sg.Text('', background_color='red'), sg.Text('Visitadas ', pad=(0, 0)),
-               sg.Text('', background_color='orange'), sg.Text('Primo ', pad=(0, 0)),
-               sg.Text('', background_color='black'), sg.Text('De árvore ', pad=(0, 0))],
-              [sg.Push(), sg.Text('Legenda de vértices:'), sg.Push()],
-              [sg.Text('', background_color='green'), sg.Text('Em processo de visita ', pad=(0, 0)),
-               sg.Text('', background_color='red'), sg.Text('Totalmente explorados ', pad=(0, 0))],
-              [sg.HSeparator()],
-              [sg.Push(), sg.Button('Mudar vertice inicial'), sg.Push(), sg.Button('Busca'),
-               sg.Push(), sg.Button('Sair'), sg.Push()],
-              ]
+    layout = [
+    [
+        sg.Text(f'Fila: {vertices_enfileirados}', key="-TEXT-", font=("Ubuntu", 20))
+    ],
+    [
+        sg.Column([
+            [sg.Image(filename=caminho_imagem, key="-IMAGE-")]
+        ]),
+        sg.VSeparator(),
+        sg.Column([
+            [sg.Text(f'Arvore', font=("Ubuntu", 20))],
+            [sg.Text(''), sg.Text(''),sg.Text(''),sg.Text('')],
+            [sg.Text('Legenda de arestas:')],
+            [sg.Text('', background_color='green'), sg.Text('Em processo de visita ', pad=(0, 0))],
+            [sg.Text('', background_color='red'), sg.Text('Visitadas ', pad=(0, 0))],
+            [sg.Text('', background_color='black'), sg.Text('Pai ', pad=(0, 0))],
+            [sg.Text('', background_color='DarkBlue'), sg.Text('Irmão ', pad=(0, 0))],
+            [sg.Text('', background_color='DarkMagenta'), sg.Text('Tio ', pad=(0, 0))],
+            [sg.Text('', background_color='orange'), sg.Text('Primo ', pad=(0, 0))],
+            [sg.Text(''), sg.Text('')],
+            [sg.Text('Legenda de vértices:')],
+            [sg.Text('', background_color='green'), sg.Text('Em processo de visita ', pad=(0, 0))],
+            [sg.Text('', background_color='red'), sg.Text('Totalmente explorados ', pad=(0, 0))]
+            
+        ], vertical_alignment='center'),
+        sg.Column([
+            
+            [sg.Image(filename="grafo/arvore.png", key="-IMAGE2-")]
+        ])
+    ],
+    [sg.HSeparator()],
+    [
+        sg.Push(), sg.Button('Mudar vertice inicial'), sg.Button('Busca'),
+        sg.Button('Sair'), sg.Push()
+    ]
+    ]   
+
 
     window = sg.Window('Busca em Largura', layout, resizable=True, finalize=True, auto_size_buttons=True,
                        auto_size_text=True)
@@ -344,6 +381,8 @@ def interface_buscaLarg(grafo):
         if event == 'Busca':
             vertice_inicial = vert_inicial(matriz_adjacencia)
             buscar_em_largura(window, caminho_imagem, matriz_adjacencia, vertice_inicial, arvore)
+            #limpa a arvore para se for feita outra busca não usar a mesma arvore
+            arvore.clear()
             # talvez retorna o vértice o qual a bipartição é nula
             window.Refresh()
         """
