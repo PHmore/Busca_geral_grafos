@@ -3,6 +3,7 @@ import PySimpleGUI as sg
 # ! Gera o grafo e o salva como imagem
 from lerGrafo import interface_lerGrafo
 from buscaLarg import interface_buscaLarg
+from funGrafo import *
 
 
 # ! Exibir e mostrar opções doq fazer com o grafo
@@ -42,6 +43,7 @@ def main():
         
         if event == 'Verificar se é conexo':
             print("Será feita " ,event)
+            G_connect_interface(grafo_selecionado)
 
         if event == 'Aplicar busca em largura':
 

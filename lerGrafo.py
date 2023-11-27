@@ -1,5 +1,5 @@
 import PySimpleGUI as sg
-from buscaLarg import gerar_imagem_do_grafo
+from buscaLarg import criar_grafo
 
 def ler_matrizes_arquivo(caminho_arquivo):
     matrizes = []
@@ -52,5 +52,5 @@ def interface_lerGrafo ():
 
     window.close()
     #matriz_selecionada = matriz_adjacencia_para_lista(matriz_selecionada)
-    gerar_imagem_do_grafo(matriz_selecionada,None)
+    criar_grafo(matriz_selecionada)
     return matriz_selecionada

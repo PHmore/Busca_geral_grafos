@@ -1,8 +1,72 @@
+import PySimpleGUI as sg
+from lerGrafo import interface_lerGrafo
+from buscaLarg import criar_grafo
+from Vertice import Vertice
+#from buscaLarg import interface_buscaLarg
+
 # Aqui estarão as outras funções
 
 # Apresentar o grafo visualmente acima da opções
 
 # Verificar se é conexo
+
+def G_connect (G_pgv):
+    print("Será feita uma verificação usando busca profunda")
+    num_vertices = list()
+    vertices = list()
+    arestas = []
+
+    arestas = list(G_pgv.edges())
+    #Converte uma lista de strings para uma lista de inteiros
+    arestas = [(int(aresta[0]), int(aresta[1])) for aresta in arestas ]
+
+    #list_vert = G_pvg.nodes()
+
+    for v in range(len(G_pgv.nodes())):
+        novo_no = Vertice(v,-1)
+        num_vertices.append(v)
+        vertices.append(novo_no)
+
+    for v in vertices:
+        for n in arestas:
+            if v.numero in n:
+                if n[0] == v.numero and n[1] not in v.adjacencia:
+                    v.adjacencia.append(n[1])
+                    print(v.adjacencia)
+                elif n[1] == v.numero and n[0] not in v.adjacencia:
+                    v.adjacencia.append(n[0])
+                    print(v.adjacencia)
+
+
+def G_connect_interface (matriz_adjacencia):
+    caminho_imagem = "grafo/grafo.png"
+    G_pgv = criar_grafo(matriz_adjacencia)
+    sg.theme('Reddit')
+
+    # Layout da interface
+    layout = [
+        [sg.Image(filename=caminho_imagem,key="-IMAGE-")],
+        [sg.Push(), sg.Button('Verificar se é conexo',size=(20, 1), button_color=('white', 'DarkGreen'))],
+        [sg.Push()],
+        [sg.Push(), sg.Button('Sair', size=(20, 1), button_color=('white', 'DarkRed')), sg.Push()]
+    ]
+
+    # Criar a janela
+    window = sg.Window("Exibir Imagem", layout, resizable=True, finalize=True)
+    while True:
+        event, values = window.read()
+        if event == sg.WIN_CLOSED:
+            break
+        
+        if event == 'Verificar se é conexo':
+            print("Será feita " ,event)
+            G_connect(G_pgv)
+
+        if event == 'Sair':
+            break
+
+    # Fechar a janela
+    window.close()
 
 '''
 Será retornado 1 caso seja conexo e será retornado NULL caso não seja
@@ -12,164 +76,57 @@ correspondentes a cada componente conexa que o grafo possuir
 '''
 
 
-
-
-# Exibir o grau de cada vértice
-
-
-# Aplicar busca em largura
-
-
-# Encontrar bipartição
 """
-class Vertice:
-    def __init__(self, numero, adjacencia):
-        self.numero = numero
-        self.adjacencia = adjacencia
+import pygraphviz as pgv
 
-def verifica_bipartido(vertices):
-    groupA = set()
-    groupB = set()
+# Suponha que você já tenha um grafo G_pgv
 
-    for v in vertices:
-        if v not in groupA and v not in groupB:
-            groupA.add(v)
-            stack = [v]
+# Função para realizar busca em profundidade (DFS)
+def dfs(v, visited, component):
+    visited[v] = True
+    component.append(v)
+    for adj in vertices[v].adjacencia:
+        if not visited[adj]:
+            dfs(adj, visited, component)
 
-            while stack:
-                current = stack.pop()
-
-                for adj in vertices[current].adjacencia:
-                    if adj in groupA:
-                        return False  # Se um vértice adjacente já está em groupA, o grafo não é bipartido
-                    elif adj not in groupB:
-                        groupB.add(adj)
-                        stack.append(adj)
-
-    return True  # Se nenhum conflito for encontrado, o grafo é bipartido
-
-# Exemplo de uso:
-vertices = {
-    1: Vertice(1, [2, 3]),
-    2: Vertice(2, [1, 4]),
-    3: Vertice(3, [1, 4]),
-    4: Vertice(4, [2, 3])
-}
-
-resultado = verifica_bipartido(vertices)
-if resultado:
-    print("O grafo é bipartido.")
-else:
-    print("O grafo não é bipartido.")
-
-"""
-
-"""
-7 – Caso o grafo seja bipartido, a opção 3 deve apresentar a bipartição do grafo, caso ele não seja
-bipartido, esta opção deve informar que é impossível encontrar a bipartição porque o grafo não é
-bipartido, em seguida apresentar o ciclo ímpar que há no grafo
-"""
-
-# !A implementação deve ser original, i.e. não usar bibliotecas prontas para efetuar as principais
-# !tarefas solicitadas;
-
-
-"""
-ALTERNATIVA de leitura dos vértices usando matriz de adjacência
-
-def calcular_grau_vertice(matriz_adjacencia):
-    graus = []
-    num_vertices = len(matriz_adjacencia)
-
-    for i in range(num_vertices):
-        grau = 0
-        for j in range(num_vertices):
-            if matriz_adjacencia[i][j] == 1:
-                grau += 1
-        graus.append(grau)
-    print(graus)
-    return graus
-
-# Exemplo de uso
-matriz_adjacencia = [
-    [0, 1, 1, 0, 0],
-    [1, 0, 1, 1, 0],
-    [1, 1, 0, 1, 1],
-    [0, 1, 1, 0, 1],
-    [0, 0, 1, 1, 0]
-]
-
-graus = calcular_grau_vertice(matriz_adjacencia)
-
-for i, grau in enumerate(graus):
-    print(f"O vértice {i+1} tem grau {grau}.")
-
+# Verificação de desconexão
+def verificar_desconexo(G):
+    visited = [False] * len(G.nodes())
+    components = []
     
+    for v in G.nodes():
+        if not visited[v]:
+            component = []
+            dfs(v, visited, component)
+            components.append(component)
+    
+    return components
 
+# Salvando cada conjunto de vértices e arestas para cada componente
+def salvar_componentes_desconexos(components, arestas):
+    conjuntos_vertices = []
+    conjuntos_arestas = []
+    
+    for component in components:
+        vertices_componente = [vertices[v] for v in component]
+        conjuntos_vertices.append(vertices_componente)
+        
+        arestas_componente = [aresta for aresta in arestas if aresta[0] in component and aresta[1] in component]
+        conjuntos_arestas.append(arestas_componente)
+    
+    return conjuntos_vertices, conjuntos_arestas
 
-def dfs(grafo, vertice, visitados):
-    visitados.add(vertice)
-    for vizinho in grafo[vertice]:
-        if vizinho not in visitados:
-            dfs(grafo, vizinho, visitados)
+# Seu código continua aqui...
+# ... (adicionando nós e arestas ao grafo)
 
-def grafo_desconexo(grafo):
-    visitados = set()
-    componente = 0
+# Após adicionar nós e arestas:
+vertices = []  # Suponha que você já tenha os vértices definidos
+arestas = []   # Suponha que você já tenha as arestas definidas
 
-    for vertice in grafo:
-        if vertice not in visitados:
-            componente += 1
-            dfs(grafo, vertice, visitados)
+# Verifica a desconexão
+componentes_desconexos = verificar_desconexo(G_pgv)
 
-    return componente > 1
-
-# Exemplo de representação de um grafo como dicionário de adjacências
-grafo_exemplo = {
-    1: [2, 3],
-    2: [1],
-    3: [1],
-    4: [5],
-    5: [4]
-}
-
-if grafo_desconexo(grafo_exemplo):
-    print("O grafo é desconexo.")
-else:
-    print("O grafo é conexo.")
-
-"""
-#! Verifica se é desconexo por meio da busca em profundidade
-"""
-def dfs(grafo, vertice, visitados):
-    visitados.add(vertice)
-    for vizinho in grafo[vertice]:
-        if vizinho not in visitados:
-            dfs(grafo, vizinho, visitados)
-
-def grafo_desconexo(grafo):
-    visitados = set()
-    componente = 0
-
-    for vertice in grafo:
-        if vertice not in visitados:
-            componente += 1
-            dfs(grafo, vertice, visitados)
-
-    return componente > 1
-
-# Exemplo de representação de um grafo como lista de adjacência
-grafo_exemplo = {
-    1: [2, 3],
-    2: [1],
-    3: [1],
-    4: [5],
-    5: [4]
-}
-
-if grafo_desconexo(grafo_exemplo):
-    print("O grafo é desconexo.")
-else:
-    print("O grafo é conexo.")
+# Salva os conjuntos de vértices e arestas para cada componente desconexo
+conjuntos_vertices, conjuntos_arestas = salvar_componentes_desconexos(componentes_desconexos, arestas)
 
 """

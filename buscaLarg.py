@@ -17,7 +17,6 @@ import time
 
 # ! Gera o grafo e o salva como imagem
 from Vertice import Vertice
-from funGrafo import *
 from lerGrafo import *
 from collections import deque
 import networkx as nx
@@ -53,7 +52,6 @@ def calcular_grau_vertice(matriz_adjacencia):
     #dados_tabela = dados_tabela[:3]
     return dados_tabela
 
-
 def vert_inicial(grafo):
     sg.theme('Reddit')
     # Dados da tabela (vértices e graus)
@@ -82,14 +80,9 @@ def vert_inicial(grafo):
     window.close()
     return int(selected_vertex)
 
-
-def gerar_imagem_do_grafo(matriz_adjacencia, caminho_imagem, no_atual=None, no_visitados=None, arestas_visitadas=None,
-                          aresta_pintada=None):
+def criar_grafo(matriz_adjacencia):
     G_pgv = pgv.AGraph(strict=True, directed=False, rankdir='BT')
-    print(type(G_pgv))
-    #True size defini que o tamanho real do nó é no minimo 0.0
     G_pgv.node_attr.update({'style': 'filled', 'shape': 'circle', 'width': '0.44', 'height': '0.44','fixedsize' : 'True'})
-
     arestas = []
 
     for i in range(len(matriz_adjacencia)):
@@ -100,9 +93,16 @@ def gerar_imagem_do_grafo(matriz_adjacencia, caminho_imagem, no_atual=None, no_v
             if matriz_adjacencia[i][j] == 1:
                 G_pgv.add_edge(i, j)
                 arestas.append((i,j))
+                print("arestas na função: ",arestas)
 
+    G_pgv.layout(prog='neato')
+    G_pgv.draw('grafo/grafo.png')
+    return G_pgv
 
-    # Função para desenhar arestas com base na cor e na lista de arestas
+#! Mudar para receber o grafo e fazer as mudanças
+def atualizar_grafo(G_pgv = None, no_atual=None, no_visitados=None, arestas_visitadas=None,
+                          aresta_pintada=None):
+    
     def draw_edges(edges, color, width, G = G_pgv):
         for edge in edges:
             pgv_edge = G.get_edge(*edge)
@@ -138,9 +138,10 @@ def gerar_imagem_do_grafo(matriz_adjacencia, caminho_imagem, no_atual=None, no_v
             draw_nodes([no_atual], '#63FF5C')
     except:
         print("Primeira geração")
-    G_pgv.layout(prog='neato')
+        
     G_pgv.draw('grafo/grafo.png')
-    return arestas
+
+    #return G_pgv
 
 def colocar_arv (arvore, pai, filho, cor = "black"):
     #! Aresta especial
@@ -174,10 +175,13 @@ def buscar_em_largura(window,caminho_imagem,matriz_adjacencia, vertices_visitado
     arestas = []
     vertices = list()
     arestas_visitadas = list()
+    G_pgv = criar_grafo(matriz_adjacencia)
 
     #Obtem por meio da leitura do grafo as arestas
-    arestas = gerar_imagem_do_grafo(matriz_adjacencia, caminho_imagem)
-    print (arestas)
+    arestas = list(G_pgv.edges())
+    #Converte uma lista de strings para uma lista de inteiros
+    arestas = [(int(aresta[0]), int(aresta[1])) for aresta in arestas ]
+    print ("Arestas estão aqui: ",arestas)
 
     # Cria um nó para todos os vértices e aloca todos em uma lista
     num_vertices = list()
@@ -238,7 +242,7 @@ def buscar_em_largura(window,caminho_imagem,matriz_adjacencia, vertices_visitado
                 print("Niveis",vertices[vizinho].nivel_na_arvore,vertice_atual.nivel_na_arvore)
                 # criar nó(w) na árvore e definir v como seu pai e atribuir nível = variável
 
-                gerar_imagem_do_grafo(matriz_adjacencia, caminho_imagem, vertice_atual.numero, vertices_visitados,
+                atualizar_grafo(G_pgv, vertice_atual.numero, vertices_visitados,
                                       arestas_visitadas, aresta_escolhida)  # Gera imagem
                 window["-TEXT-"].update(f'Fila: {vertices_enfileirados}')
                 window['-IMAGE-'].update(f'{caminho_imagem}')
@@ -269,7 +273,7 @@ def buscar_em_largura(window,caminho_imagem,matriz_adjacencia, vertices_visitado
                         print("Aresta Tio")
                         colocar_arv(arvore, vertice_atual.numero, vertices[vizinho].numero, "DarkMagenta")
 
-                    gerar_imagem_do_grafo(matriz_adjacencia, caminho_imagem, vertice_atual.numero, vertices_visitados,
+                    atualizar_grafo(G_pgv, vertice_atual.numero, vertices_visitados,
                                           arestas_visitadas, aresta_escolhida)  # Gera imagem
                     window["-TEXT-"].update(f'Fila: {vertices_enfileirados}')
                     window['-IMAGE-'].update(f'{caminho_imagem}')
@@ -279,7 +283,7 @@ def buscar_em_largura(window,caminho_imagem,matriz_adjacencia, vertices_visitado
                 # Caso já esteja marcado e fora da fila não fará nada
                 # Tanto que tlvz possa até tirar o else e todo bloco de código dele
                 else:
-                    gerar_imagem_do_grafo(matriz_adjacencia, caminho_imagem, vertice_atual.numero, vertices_visitados,
+                    atualizar_grafo(G_pgv, vertice_atual.numero, vertices_visitados,
                                           arestas_visitadas)  # Gera imagem
                     window['-IMAGE-'].update(f'{caminho_imagem}')
                     window["-IMAGE2-"].update(filename="grafo/arvore.png")
@@ -291,7 +295,7 @@ def buscar_em_largura(window,caminho_imagem,matriz_adjacencia, vertices_visitado
 
     # Como se repete enquanto houver uma fila irá visitar todos os vértices sequencialmente
 
-    gerar_imagem_do_grafo(matriz_adjacencia, caminho_imagem, vertice_atual.numero, vertices_visitados,
+    atualizar_grafo(G_pgv, vertice_atual.numero, vertices_visitados,
                           arestas_visitadas)  # Gera imagem
     window["-TEXT-"].update(f'Fila: {vertices_enfileirados}')
     window['-IMAGE-'].update(f'{caminho_imagem}')
