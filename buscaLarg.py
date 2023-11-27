@@ -170,12 +170,10 @@ def colocar_arv (arvore, pai, filho, cor = "black"):
     G.draw('grafo/arvore.png')
     return arvore
 
-def buscar_em_largura(window,caminho_imagem,matriz_adjacencia, vertices_visitados, vertice_inicial=None,arvore = None, ):
+def buscar_em_largura(window,G_pgv,caminho_imagem, vertices_visitados, vertice_inicial=None,arvore = None, ):
     #Declarando variáveis
     arestas = []
-    vertices = list()
     arestas_visitadas = list()
-    G_pgv = criar_grafo(matriz_adjacencia)
 
     #Obtem por meio da leitura do grafo as arestas
     arestas = list(G_pgv.edges())
@@ -185,7 +183,7 @@ def buscar_em_largura(window,caminho_imagem,matriz_adjacencia, vertices_visitado
 
     # Cria um nó para todos os vértices e aloca todos em uma lista
     num_vertices = list()
-    for v in range(len(matriz_adjacencia)):
+    for v in range(len(G_pgv.nodes())):
         novo_no = Vertice(v,-1)
         num_vertices.append(v)
         vertices.append(novo_no)
@@ -308,10 +306,8 @@ def buscar_em_largura(window,caminho_imagem,matriz_adjacencia, vertices_visitado
         print ("O grafo é conexo")
     else:
         print ("O grafo possui as componente ",G_conn," Desconexas")
-        buscar_em_largura(window, caminho_imagem, matriz_adjacencia, vertices_visitados, G_conn[0], arvore)
-    isBipart(arvore,vertices,G_pgv)
-    caminho_imagem = 'grafo/G_bipart.png'
-    window['-IMAGE-'].update(f'{caminho_imagem}')
+        buscar_em_largura(window, G_pgv,caminho_imagem, vertices_visitados, G_conn[0], arvore)
+        
     
 
 def isConnect (vertices_comp,vertices_totais):
@@ -330,7 +326,7 @@ def isConnect (vertices_comp,vertices_totais):
 #! Para recolorir o grafo primeiro será necessário colorir ó de gray e dps pode se usar duas cores uma pra cada conjunto
 #! A função pode ser feita simplesmente pintando os vértices vizinho de cor diferente dos vértices atuais
 #! Enquanto o ciclo impar pode ser pintado da mesma cor
-def isBipart (arvore, vertices, G_pgv = None):
+def isBipart (arvore, G_pgv = None):
     if False:
         print("O grafo não é bipartido e um ciclo impar será pintado")
     else:
@@ -379,6 +375,8 @@ def interface_buscaLarg(grafo):
     global arestas_primo
     global arestas_tio
     global arestas_irmao
+    global vertices
+
     matriz_adjacencia = grafo
 
     caminho_imagem = caminho_imagem = "grafo/grafo.png"
@@ -400,6 +398,8 @@ def interface_buscaLarg(grafo):
     arestas_tio = list()
     arestas_pai = list()
     arestas_irmao = list()
+
+    vertices = list()
     vertices_enfileirados = list()
     vertices_visitados = list ()
 
@@ -434,6 +434,7 @@ def interface_buscaLarg(grafo):
             [sg.Text('', background_color='DarkMagenta'), sg.Text('Tio ', pad=(0, 0))],
             [sg.Text('', background_color='orange'), sg.Text('Primo ', pad=(0, 0))],
             [sg.Text(''), sg.Text('')]
+            #Colocar mensagem embaixo da arvore falando se o grafo é conexo ou não
             
         ], vertical_alignment='center'),
         sg.Column([
@@ -465,7 +466,8 @@ def interface_buscaLarg(grafo):
 
         if event == 'Busca':
             vertice_inicial = vert_inicial(matriz_adjacencia)
-            buscar_em_largura(window, caminho_imagem, matriz_adjacencia, vertices_visitados, vertice_inicial, arvore)
+            G_pgv = criar_grafo(matriz_adjacencia)
+            buscar_em_largura(window, G_pgv,caminho_imagem , vertices_visitados, vertice_inicial, arvore)
             
 
             #limpa a arvore para se for feita outra busca não usar a mesma arvore
@@ -474,6 +476,7 @@ def interface_buscaLarg(grafo):
             window.Refresh()
         if event == 'Mostrar bipartição':
             print("A bipartição será mostrada recolorindo a árvore")
-            isBipart(arvore)
+            isBipart(arvore,G_pgv)
+            window["-IMAGE-"].update(filename="grafo/G_bipart.png")
     window.close()
     return
