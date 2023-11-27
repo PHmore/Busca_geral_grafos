@@ -37,6 +37,10 @@ def G_connect (G_pgv):
                     v.adjacencia.append(n[0])
                     print(v.adjacencia)
 
+    for v in vertices:
+        print(v.numero, "Adjacencia",v.adjacencia)
+        #Será feito uma coloração onde o vértices e seus adjacentes receberão a mesma cor
+        #Dps será conferido quais vértices não foram coloridos e serão colocados de outra cor eles e seu adjacentes
 
 def G_connect_interface (matriz_adjacencia):
     caminho_imagem = "grafo/grafo.png"

@@ -302,13 +302,17 @@ def buscar_em_largura(window,caminho_imagem,matriz_adjacencia, vertices_visitado
     window["-IMAGE2-"].update(filename="grafo/arvore.png")
     window.refresh()
     # time.sleep(1)
-    isBipart(arvore,vertices)
     G_conn = isConnect(vertices_visitados,num_vertices)
+    
     if (not G_conn):
         print ("O grafo é conexo")
     else:
         print ("O grafo possui as componente ",G_conn," Desconexas")
         buscar_em_largura(window, caminho_imagem, matriz_adjacencia, vertices_visitados, G_conn[0], arvore)
+    isBipart(arvore,vertices,G_pgv)
+    caminho_imagem = 'grafo/G_bipart.png'
+    window['-IMAGE-'].update(f'{caminho_imagem}')
+    
 
 def isConnect (vertices_comp,vertices_totais):
 
@@ -358,8 +362,10 @@ def isBipart (arvore, vertices, G_pgv = None):
                             stack.append(adj)
         
         print("Grupo A : ",groupA,"Grupo B: ",groupB)
-        #draw_nodes(groupA,'orange',arvore)
-        #draw_nodes(groupA,'pink',arvore)
+        draw_nodes(groupA,'yellow',G_pgv)
+        draw_nodes(groupB,'pink',G_pgv)
+        G_pgv.draw('grafo/G_bipart.png')
+        
         
         
 
