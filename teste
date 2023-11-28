@@ -1,17 +1,13 @@
-import pygraphviz as pgv
+def retorna_dois_valores():
+    return 10, 20  # Retornando dois valores, implicitamente, como uma tupla
 
-# Crie um novo grafo direcionado usando PyGraphviz
-G_pvg = pgv.AGraph(strict=False, directed=True)
+# Chamada da função
+resultado = retorna_dois_valores()
 
-# Adicione alguns nós ao grafo
-G_pvg.add_node('A')
-G_pvg.add_node('B')
-G_pvg.add_node('C')
-G_pvg.add_node('D')
+# Atribuição dos valores retornados a variáveis separadas
+valor1, valor2 = retorna_dois_valores()
 
-# Obtenha todos os nós do grafo
-nodes_list = G_pvg.nodes()
-
-# Exiba a lista de nós
-print(nodes_list)
-print(len(nodes_list))
+# Impressão dos valores
+print(resultado)  # Isso imprimirá a tupla (10, 20)
+print(valor1)     # Isso imprimirá 10
+print(valor2)     # Isso imprimirá 20

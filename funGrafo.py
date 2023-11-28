@@ -42,6 +42,36 @@ def G_connect (G_pgv):
         #Será feito uma coloração onde o vértices e seus adjacentes receberão a mesma cor
         #Dps será conferido quais vértices não foram coloridos e serão colocados de outra cor eles e seu adjacentes
 
+def G_bipart (G_pgv):
+    num_vertices = list()
+    vertices = list()
+    arestas = []
+
+    arestas = list(G_pgv.edges())
+    #Converte uma lista de strings para uma lista de inteiros
+    arestas = [(int(aresta[0]), int(aresta[1])) for aresta in arestas ]
+
+    #list_vert = G_pvg.nodes()
+
+    for v in range(len(G_pgv.nodes())):
+        novo_no = Vertice(v,-1)
+        num_vertices.append(v)
+        vertices.append(novo_no)
+
+    for v in vertices:
+        for n in arestas:
+            if v.numero in n:
+                if n[0] == v.numero and n[1] not in v.adjacencia:
+                    v.adjacencia.append(n[1])
+                    print(v.adjacencia)
+                elif n[1] == v.numero and n[0] not in v.adjacencia:
+                    v.adjacencia.append(n[0])
+                    print(v.adjacencia)
+
+    for v in vertices:
+        print(v.numero, "Adjacencia",v.adjacencia)
+
+#Remover essa interface depois de tiver implementado 
 def G_connect_interface (matriz_adjacencia):
     caminho_imagem = "grafo/grafo.png"
     G_pgv = criar_grafo(matriz_adjacencia)
@@ -72,6 +102,14 @@ def G_connect_interface (matriz_adjacencia):
     # Fechar a janela
     window.close()
 
+matriz = [
+    [0, 1, 0, 0],
+    [1, 0, 0, 0],
+    [0, 0, 0, 1],
+    [0, 0, 1, 0]
+]
+
+G_connect_interface (matriz)
 '''
 Será retornado 1 caso seja conexo e será retornado NULL caso não seja
 Caso o usuário selecione a opção “1” o programa deve responder SIM, caso o grafo seja conexo,
