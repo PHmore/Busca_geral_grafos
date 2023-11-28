@@ -37,10 +37,31 @@ def G_connect (G_pgv):
                     v.adjacencia.append(n[0])
                     print(v.adjacencia)
 
+    #Modificar lógica para que guarde cada componente criada por um vértice
+    # e suas adjacencias em um vetor que ficará na matriz componentes
+    groupA = list()
+    groupB = list()
+
+    print("O grafo é bipartido e a árvore será recolorido em 2 cores diferentes")
+
     for v in vertices:
-        print(v.numero, "Adjacencia",v.adjacencia)
-        #Será feito uma coloração onde o vértices e seus adjacentes receberão a mesma cor
-        #Dps será conferido quais vértices não foram coloridos e serão colocados de outra cor eles e seu adjacentes
+        if v.numero not in groupA and v.numero not in groupB:
+            groupA.append(v.numero)
+            stack = [v.numero]
+
+            while stack:
+                current = stack.pop()
+
+                for adj in vertices[current].adjacencia:
+                    if adj not in groupA and adj not in groupB:
+                        # Adiciona aos grupos alternadamente
+                        if current in groupA:
+                            groupB.append(adj)
+                        else:
+                            groupA.append(adj)
+                        stack.append(adj)
+        
+    print("Grupo A : ",groupA,"Grupo B: ",groupB)
 
 def G_bipart (G_pgv):
     num_vertices = list()
@@ -68,8 +89,32 @@ def G_bipart (G_pgv):
                     v.adjacencia.append(n[0])
                     print(v.adjacencia)
 
+    #Talvez seja necessário aplicar uma busca em 
+    # largura e árvores para mostrar o ciclo impar
+    #Está dividindo o grafo se for bipartido
+    groupA = list()
+    groupB = list()
+
+    print("O grafo é bipartido e a árvore será recolorido em 2 cores diferentes")
+
     for v in vertices:
-        print(v.numero, "Adjacencia",v.adjacencia)
+        if v.numero not in groupA and v.numero not in groupB:
+            groupA.append(v.numero)
+            stack = [v.numero]
+
+            while stack:
+                current = stack.pop()
+
+                for adj in vertices[current].adjacencia:
+                    if adj not in groupA and adj not in groupB:
+                        # Adiciona aos grupos alternadamente
+                        if current in groupA:
+                            groupB.append(adj)
+                        else:
+                            groupA.append(adj)
+                        stack.append(adj)
+        
+    print("Grupo A : ",groupA,"Grupo B: ",groupB)
 
 #Remover essa interface depois de tiver implementado 
 def G_connect_interface (matriz_adjacencia):
@@ -94,7 +139,7 @@ def G_connect_interface (matriz_adjacencia):
         
         if event == 'Verificar se é conexo':
             print("Será feita " ,event)
-            G_connect(G_pgv)
+            G_bipart(G_pgv)
 
         if event == 'Sair':
             break
