@@ -181,12 +181,16 @@ def buscar_em_largura(window,G_pgv,caminho_imagem, vertices_visitados, vertice_i
     arestas = [(int(aresta[0]), int(aresta[1])) for aresta in arestas ]
     print ("Arestas estão aqui: ",arestas)
 
-    # Cria um nó para todos os vértices e aloca todos em uma lista
+    
+        # Cria um nó para todos os vértices e aloca todos em uma lista
     num_vertices = list()
     for v in range(len(G_pgv.nodes())):
-        novo_no = Vertice(v,-1)
         num_vertices.append(v)
-        vertices.append(novo_no)
+        if len(vertices) <= v:
+            print("VÉRTICES DECLARADOS")
+            novo_no = Vertice(v,-1)
+            vertices.append(novo_no)
+            
 
     # Determina toda a vizinhança dos vértices
     for v in vertices:
@@ -199,7 +203,7 @@ def buscar_em_largura(window,G_pgv,caminho_imagem, vertices_visitados, vertice_i
                     v.adjacencia.append(n[0])
                     print(v.adjacencia)
 
-    print(vertice_inicial)
+    print(vertices)
     # Cria e insere o vértice inicial na fila duplamente encadeada e na arvóre
     fila = deque([vertices[vertice_inicial]])
     vertices[vertice_inicial].marcado = True
@@ -232,13 +236,13 @@ def buscar_em_largura(window,G_pgv,caminho_imagem, vertices_visitados, vertice_i
                 vertices_enfileirados.append(vertices[vizinho].numero)
                 vertices_visitados.append(vertices[vizinho].numero)
 
+                arestas_pai.append(aresta_escolhida)
+
                 # Adiciona na árvore com aresta pai
                 colocar_arv(arvore, vertice_atual.numero, vertices[vizinho].numero)
                 vertices[vizinho].numero_pai = vertice_atual.numero
-                print("Numeros",vertices[vizinho].numero_pai,vertices[vizinho].numero)
+                print("Adicionando pai do ", vertices[vizinho].numero ,"Como ",vertices[vizinho].numero_pai)
                 vertices[vizinho].nivel_na_arvore = vertice_atual.nivel_na_arvore + 1
-                print("Niveis",vertices[vizinho].nivel_na_arvore,vertice_atual.nivel_na_arvore)
-                # criar nó(w) na árvore e definir v como seu pai e atribuir nível = variável
 
                 atualizar_grafo(G_pgv, vertice_atual.numero, vertices_visitados,
                                       arestas_visitadas, aresta_escolhida)  # Gera imagem
@@ -259,16 +263,16 @@ def buscar_em_largura(window,G_pgv,caminho_imagem, vertices_visitados, vertice_i
                     #!Aresta irmão
                     #! Salvar os vértices que o compõe pois por meio deles poderemos apresentar o ciclo impar
                     if (vertice_atual.numero_pai == vertices[vizinho].numero_pai):
-                        print("Aresta irmão")
+                        arestas_irmao.append(aresta_escolhida)
                         colocar_arv(arvore, vertice_atual.numero, vertices[vizinho].numero, "DarkBlue")
                     #!Aresta prima
                     #! Salvar os vértices que o compõe pois por meio deles poderemos apresentar o ciclo impar
                     elif (vertice_atual.nivel_na_arvore == vertices[vizinho].nivel_na_arvore):
-                        print("Aresta Prima")
+                        arestas_primo.append(aresta_escolhida)
                         colocar_arv(arvore, vertice_atual.numero, vertices[vizinho].numero, "orange")
                     #!Aresta Tio
                     else:
-                        print("Aresta Tio")
+                        arestas_tio.append(aresta_escolhida)
                         colocar_arv(arvore, vertice_atual.numero, vertices[vizinho].numero, "DarkMagenta")
 
                     atualizar_grafo(G_pgv, vertice_atual.numero, vertices_visitados,
@@ -307,6 +311,7 @@ def buscar_em_largura(window,G_pgv,caminho_imagem, vertices_visitados, vertice_i
     else:
         print ("O grafo possui as componente ",G_conn," Desconexas")
         buscar_em_largura(window, G_pgv,caminho_imagem, vertices_visitados, G_conn[0], arvore)
+    print(vertices)
         
     
 
@@ -327,18 +332,70 @@ def isConnect (vertices_comp,vertices_totais):
 #! A função pode ser feita simplesmente pintando os vértices vizinho de cor diferente dos vértices atuais
 #! Enquanto o ciclo impar pode ser pintado da mesma cor
 def isBipart (arvore, G_pgv = None):
-    if False:
-        print("O grafo não é bipartido e um ciclo impar será pintado")
+    def draw_nodes(nodes, color, G = G_pgv):
+            for node in nodes:
+                pgv_node = G.get_node(node)
+                pgv_node.attr['color'] = color
+    
+    if arestas_irmao or arestas_primo:
+        print("O grafo não é bipartido e um ciclo ímpar será pintado")
+        print(vertices)
+        arestas_special = list()
+        ciclo_impar = list()
+        
+        if arestas_irmao is not None:
+            arestas_special.extend(arestas_irmao)
+        
+        if arestas_primo is not None:
+            arestas_special.extend(arestas_primo)
+        
+        verticeA = None
+        verticeB = None
+        
+        for v in vertices:
+            if v.numero == arestas_special[0][0]:
+                verticeA = v
+                
+            if v.numero == arestas_special[0][1]:
+                verticeB = v    
+    
+        print("Passando pelo for nenhum vértice é igual: ",arestas_special[0][0],arestas_special[0][1])
+        ciclo_impar.append(verticeA.numero)
+        ciclo_impar.append(verticeB.numero)
+        while verticeA.numero_pai != verticeB.numero_pai:
+            print(ciclo_impar)
+            print("Vertice A numero: ",verticeA.numero)
+            print("Vertice B numero: ",verticeB.numero)
+            for v in vertices:
+                if v.numero == verticeA.numero_pai:
+                    verticeA = v
+                    break
+            for v in vertices:
+                if v.numero == verticeB.numero_pai:
+                    verticeB = v
+                    break
+            print("Vertice A numero: ",verticeA.numero)
+            print("Vertice B numero: ",verticeB.numero)
+            ciclo_impar.append(verticeA.numero)
+            ciclo_impar.append(verticeB.numero)
+        ciclo_impar.append(verticeA.numero_pai)
+        print("Pai: ",verticeA.numero_pai, verticeB.numero_pai)
+            
+
+        print(ciclo_impar)
+        
+        draw_nodes(ciclo_impar,'yellow')
+        verticeA = None
+        verticeB = None
+        ciclo_impar.clear()
+        arestas_special.clear()
+
+
     else:
         groupA = list()
         groupB = list()
 
         print("O grafo é bipartido e a árvore será recolorido em 2 cores diferentes")
-        
-        def draw_nodes(nodes, color, G = G_pgv):
-            for node in nodes:
-                pgv_node = G.get_node(node)
-                pgv_node.attr['color'] = color
 
         for v in vertices:
             if v.numero not in groupA and v.numero not in groupB:
@@ -360,7 +417,7 @@ def isBipart (arvore, G_pgv = None):
         print("Grupo A : ",groupA,"Grupo B: ",groupB)
         draw_nodes(groupA,'yellow',G_pgv)
         draw_nodes(groupB,'pink',G_pgv)
-        G_pgv.draw('grafo/G_bipart.png')
+    G_pgv.draw('grafo/G_bipart.png')
         
         
         
@@ -376,6 +433,7 @@ def interface_buscaLarg(grafo):
     global arestas_tio
     global arestas_irmao
     global vertices
+    global componentes
 
     matriz_adjacencia = grafo
 
@@ -393,6 +451,8 @@ def interface_buscaLarg(grafo):
     arvore = nx.Graph()
     colocar_arv(arvore,None,0)
     arvore.clear()
+
+    componentes = 0
 
     arestas_primo = list() 
     arestas_tio = list()
@@ -465,10 +525,20 @@ def interface_buscaLarg(grafo):
             window.Refresh()
 
         if event == 'Busca':
+            
+            arestas_primo.clear()
+            arestas_tio.clear()
+            arestas_pai.clear()
+            arestas_irmao.clear()
+            vertices.clear()
+            vertices_enfileirados.clear()
+            vertices_visitados.clear()
             vertice_inicial = vert_inicial(matriz_adjacencia)
             G_pgv = criar_grafo(matriz_adjacencia)
             buscar_em_largura(window, G_pgv,caminho_imagem , vertices_visitados, vertice_inicial, arvore)
             
+            print("Saiu",vertices)
+            print(arestas_primo,arestas_irmao)
 
             #limpa a arvore para se for feita outra busca não usar a mesma arvore
             arvore.clear()
