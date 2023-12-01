@@ -259,9 +259,6 @@ def interface_buscaLarg(G_pgv, matriz_adjacencia):
     global vertices_enfileirados
 
     #! Variáveis para guardar os dados se necessário
-    global arestas_pai
-    global arestas_tio
-    global componentes
 
     caminho_imagem = caminho_imagem = "grafo/grafo.png"
     sg.theme('Reddit')

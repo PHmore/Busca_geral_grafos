@@ -61,6 +61,16 @@ def main():
 
         if event == 'Mostrar bipartição do grafo':
             print("Será feita")
+            arestas_irmao = list()
+            arestas_primo = list()
+            vertices = list()
+            vertices_visitado= list()
+            arestas_pai = list()
+            arestas_tio = list()
+            buscar_em_largura(G_pgv,"grafo/grafo.png",vertices,vertices_visitado,
+                              arestas_irmao,arestas_primo,arestas_pai,arestas_tio)
+            isBipart(vertices, arestas_irmao, arestas_primo, None, G_pgv)
+            window["-IMAGE-"].update(filename="grafo/G_bipart.png")
 
         if event == 'Escolher outro grafo':
             G_pgv, grafo_selecionado = interface_lerGrafo()
