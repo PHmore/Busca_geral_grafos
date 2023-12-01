@@ -19,7 +19,6 @@ import time
 from Vertice import Vertice
 from lerGrafo import *
 from collections import deque
-import networkx as nx
 import pygraphviz as pgv
 
 
@@ -143,32 +142,33 @@ def atualizar_grafo(G_pgv = None, no_atual=None, no_visitados=None, arestas_visi
 
     #return G_pgv
 
-def colocar_arv (arvore, pai, filho, cor = "black"):
-    #! Aresta especial
-    if arvore.has_node(pai) and arvore.has_node(filho):
+import pygraphviz as pgv
+
+def colocar_arv(arvore, pai, filho, cor="black"):
+    # Criar um novo gráfico
+
+    if pai == None:
+        arvore.add_node(filho)
+    
+    elif str(pai) in arvore.nodes() and str(filho) in arvore.nodes():
         arvore.add_edge(pai, filho, color=cor, constraint = False)
-    #! Aresta de arvore
-    elif not arvore.has_node(filho) and arvore.has_node(pai):
+    else:
+        arvore.add_node(pai)
         arvore.add_node(filho)
         arvore.add_edge(pai, filho, color=cor)
-    #! Nó inicial
-    else:
-        arvore.add_node(filho)
 
+    arvore.graph_attr.update(rankdir='TB')
+    arvore.node_attr.update(style='filled', shape='circle', width='0.3', height='0.3', fixedsize='True', color='lightblue')
+    arvore.edge_attr.update(penwidth='3.0')
 
-    # Converter para um grafo PyGraphviz
-    G = nx.nx_agraph.to_agraph(arvore)
+        # Layout
+    arvore.layout(prog='dot')    
 
-    # Configuração de tamanho para nós e arestas
-    G.graph_attr.update(rankdir='TB')
-    G.node_attr.update({'style': 'filled', 'shape': 'circle', 'width': '0.3', 'height': '0.3','fixedsize' : 'True' ,'color':'lightblue'})  # Ajuste de tamanho dos nós
-    G.edge_attr.update({'penwidth': '3.0'})  # Ajuste de largura das arestas
+    # Salvar o gráfico em um arquivo de imagem
+    arvore.draw('grafo/arvore.png')
 
-    # Layout e geração da imagem com Graphviz
-    G.layout(prog='dot')
-        
-    G.draw('grafo/arvore.png')
     return arvore
+
 
 def buscar_em_largura(window,G_pgv,caminho_imagem, vertices_visitados, vertice_inicial=None,arvore = None, ):
     #Declarando variáveis
@@ -331,11 +331,24 @@ def isConnect (vertices_comp,vertices_totais):
 #! Para recolorir o grafo primeiro será necessário colorir ó de gray e dps pode se usar duas cores uma pra cada conjunto
 #! A função pode ser feita simplesmente pintando os vértices vizinho de cor diferente dos vértices atuais
 #! Enquanto o ciclo impar pode ser pintado da mesma cor
-def isBipart (arvore, G_pgv = None):
-    def draw_nodes(nodes, color, G = G_pgv):
+def isBipart (arvore = None, G_pgv = None):
+
+    def draw_nodes(nodes, color, G_pgv = None, arvore = None):
             for node in nodes:
-                pgv_node = G.get_node(node)
-                pgv_node.attr['color'] = color
+                if G_pgv:
+                    pgv_node = G_pgv.get_node(node)
+                    pgv_node.attr['color'] = color
+                    G_pgv.draw('grafo/G_bipart.png')
+                if arvore:
+                    pgv_node = arvore.get_node(node)
+                    #pgv_node.attr['color'] = color
+                    arvore.graph_attr.update(rankdir='TB')
+                    arvore.node_attr.update(style='filled', shape='circle', width='0.3', height='0.3', fixedsize='True', color=color)
+                    arvore.edge_attr.update(penwidth='3.0')
+
+        # Layout
+                    arvore.layout(prog='dot')
+                    arvore.draw('grafo/arvoreG.png')
     
     if arestas_irmao or arestas_primo:
         print("O grafo não é bipartido e um ciclo ímpar será pintado")
@@ -384,7 +397,7 @@ def isBipart (arvore, G_pgv = None):
 
         print(ciclo_impar)
         
-        draw_nodes(ciclo_impar,'yellow')
+        draw_nodes(ciclo_impar,'yellow',G_pgv, arvore)
         verticeA = None
         verticeB = None
         ciclo_impar.clear()
@@ -415,9 +428,9 @@ def isBipart (arvore, G_pgv = None):
                             stack.append(adj)
         
         print("Grupo A : ",groupA,"Grupo B: ",groupB)
-        draw_nodes(groupA,'yellow',G_pgv)
-        draw_nodes(groupB,'pink',G_pgv)
-    G_pgv.draw('grafo/G_bipart.png')
+        draw_nodes(groupA,'yellow',G_pgv,arvore)
+        draw_nodes(groupB,'pink',G_pgv,arvore)
+    
         
         
         
@@ -440,15 +453,10 @@ def interface_buscaLarg(grafo):
     caminho_imagem = caminho_imagem = "grafo/grafo.png"
     sg.theme('Reddit')
 
-    """
-    lista = matriz_adjacencia_para_lista(matriz_adjacencia)
-    calcular_grau(lista)
+    arvore = pgv.AGraph(strict=True)
 
-    for vertice, grau in lista.items():
-        print(f'O vértice {vertice} possui grau {grau}')
-    """
-
-    arvore = nx.Graph()
+    #O nó só está sendo adicionado para que crie a arvoré caso não exista e para que faça um nova arvoré limpa
+    # Por isso a arvore é limpa logo em seguida
     colocar_arv(arvore,None,0)
     arvore.clear()
 
@@ -541,12 +549,14 @@ def interface_buscaLarg(grafo):
             print(arestas_primo,arestas_irmao)
 
             #limpa a arvore para se for feita outra busca não usar a mesma arvore
-            arvore.clear()
+
             # talvez retorna o vértice o qual a bipartição é nula
             window.Refresh()
         if event == 'Mostrar bipartição':
             print("A bipartição será mostrada recolorindo a árvore")
             isBipart(arvore,G_pgv)
+            arvore.clear()
+            window["-IMAGE2-"].update(filename="grafo/arvoreG.png")
             window["-IMAGE-"].update(filename="grafo/G_bipart.png")
     window.close()
     return

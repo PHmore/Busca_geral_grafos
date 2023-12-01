@@ -39,27 +39,27 @@ def G_connect (G_pgv):
 
     #Modificar lógica para que guarde cada componente criada por um vértice
     # e suas adjacencias em um vetor que ficará na matriz componentes
+    componentes = []
     groupA = list()
     groupB = list()
 
-    print("O grafo é bipartido e a árvore será recolorido em 2 cores diferentes")
+    for componente in componentes:
+        for v in vertices:
+            if v.numero not in componente:
+                componente.append(v.numero)
+                stack = [v.numero]
 
-    for v in vertices:
-        if v.numero not in groupA and v.numero not in groupB:
-            groupA.append(v.numero)
-            stack = [v.numero]
+                while stack:
+                    current = stack.pop()
 
-            while stack:
-                current = stack.pop()
-
-                for adj in vertices[current].adjacencia:
-                    if adj not in groupA and adj not in groupB:
-                        # Adiciona aos grupos alternadamente
-                        if current in groupA:
-                            groupB.append(adj)
-                        else:
-                            groupA.append(adj)
-                        stack.append(adj)
+                    for adj in vertices[current].adjacencia:
+                        if adj not in componente:
+                            # Adiciona aos grupos alternadamente
+                            if current in componente:
+                                componente.append(adj)
+                            else:
+                                groupA.append(adj)
+                            stack.append(adj)
         
     print("Grupo A : ",groupA,"Grupo B: ",groupB)
 
@@ -146,6 +146,40 @@ def G_connect_interface (matriz_adjacencia):
 
     # Fechar a janela
     window.close()
+
+def bipartGrafo(G_pgv):
+    print("Será feita busca em largura")
+    num_vertices = list()
+    vertices = list()
+    arestas = []
+
+    arestas = list(G_pgv.edges())
+    #Converte uma lista de strings para uma lista de inteiros
+    arestas = [(int(aresta[0]), int(aresta[1])) for aresta in arestas ]
+
+    #list_vert = G_pvg.nodes()
+
+    for v in range(len(G_pgv.nodes())):
+        novo_no = Vertice(v,-1)
+        num_vertices.append(v)
+        vertices.append(novo_no)
+
+    for v in vertices:
+        for n in arestas:
+            if v.numero in n:
+                if n[0] == v.numero and n[1] not in v.adjacencia:
+                    v.adjacencia.append(n[1])
+                    print(v.adjacencia)
+                elif n[1] == v.numero and n[0] not in v.adjacencia:
+                    v.adjacencia.append(n[0])
+                    print(v.adjacencia)
+
+    #Mini busca em largura para salvar arestas primo e irmã
+    fila = []
+    fila.append(vertices[0])
+    while fila:
+        print(fila)
+        
 
 matriz = [
     [0, 1, 0, 0],

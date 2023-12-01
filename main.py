@@ -2,7 +2,7 @@ import PySimpleGUI as sg
 
 # ! Gera o grafo e o salva como imagem
 from lerGrafo import interface_lerGrafo
-from buscaLarg import interface_buscaLarg
+from buscaLarg import *
 from funGrafo import *
 
 
@@ -25,6 +25,8 @@ def main():
     # Layout da interface
     layout = [
         [sg.Image(filename=caminho_imagem,key="-IMAGE-")],
+        [sg.HSeparator()],
+        [sg.Push()],
         [sg.Push(), sg.Button('Verificar se é conexo',size=(20, 1), button_color=('white', 'DarkGreen')),
          sg.Push(), sg.Button('Aplicar busca em largura',size=(20, 1), button_color=('white', 'DarkGreen')),
          sg.Push(), sg.Button('Mostrar bipartição do grafo',size=(20, 1),
@@ -50,7 +52,7 @@ def main():
             interface_buscaLarg(grafo_selecionado)
 
         if event == 'Mostrar bipartição do grafo':
-            print("Será feita " ,event)
+            buscar_em_largura
 
         if event == 'Escolher outro grafo':
             grafo_selecionado = interface_lerGrafo()
