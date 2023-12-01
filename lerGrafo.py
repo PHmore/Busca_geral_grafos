@@ -1,5 +1,24 @@
 import PySimpleGUI as sg
-from buscaLarg import criar_grafo
+import pygraphviz as pgv
+
+def criar_grafo(matriz_adjacencia):
+    G_pgv = pgv.AGraph(strict=True, directed=False, rankdir='BT')
+    G_pgv.node_attr.update({'style': 'filled', 'shape': 'circle', 'width': '0.44', 'height': '0.44','fixedsize' : 'True'})
+    arestas = []
+
+    for i in range(len(matriz_adjacencia)):
+        G_pgv.add_node(i)
+
+    for i in range(len(matriz_adjacencia)):
+        for j in range(i + 1, len(matriz_adjacencia[i])):
+            if matriz_adjacencia[i][j] == 1:
+                G_pgv.add_edge(i, j)
+                arestas.append((i,j))
+                print("arestas na função: ",arestas)
+
+    G_pgv.layout(prog='neato')
+    G_pgv.draw('grafo/grafo.png')
+    return G_pgv
 
 def ler_matrizes_arquivo(caminho_arquivo):
     matrizes = []
@@ -52,5 +71,5 @@ def interface_lerGrafo ():
 
     window.close()
     #matriz_selecionada = matriz_adjacencia_para_lista(matriz_selecionada)
-    criar_grafo(matriz_selecionada)
-    return matriz_selecionada
+    G_pgv = criar_grafo(matriz_selecionada)
+    return G_pgv, matriz_selecionada

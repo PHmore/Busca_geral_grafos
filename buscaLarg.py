@@ -2,103 +2,17 @@
 
 #!ERROS
 # Entender pq o grafo 8 não está realizando a 2 busca
-
-"""
-6 – Caso o usuário selecione a opção “2” o programa deve perguntar: “Qual será o vértice raiz da
-busca?” e apresentar a listagem dos vértices candidatos; Na sequência deve-se ser apresentada a
-árvore de busca em largura e apresentar pelo menos o ponto em que foi identificado que o grafo não
-seria Bipartido, no caso de o grafo não ser;
-
-** O algoritmo de reconhecimento deve utilizar a Busca em Largura tal como foi estudada em sala
-de aula;
-*** Os conjuntos de arestas geradas pela busca em largura devem ser apresentados.
-"""
 import time
 
 # ! Gera o grafo e o salva como imagem
-from Vertice import Vertice
-from lerGrafo import *
 from collections import deque
 import pygraphviz as pgv
+from funGrafo import *
 
-
-# ! Talvez seja interessante deixa escolher qualquer vértice pois se o grafo for desconexo ele gera duas arvores
-# ! Esse mesmo fator pode ser usado para mostrar as componentes desconexas por meio de arvores e
-
-# !usando set para cada componente e comporando a quantidade de vértices encontrados com a quantidade de nós totais
+# usando set para cada componente e comporando a quantidade de vértices encontrados com a quantidade de nós totais
 
 # ! Tentar fazer com que sair no meio do programa não mostre a tela de morte
 
-#! A algum erro ao recolorir bipartição do grafo árvore
-
-def calcular_grau_vertice(matriz_adjacencia):
-    graus = []
-    num_vertices = len(matriz_adjacencia)
-
-    for i in range(num_vertices):
-        grau = 0
-        for j in range(num_vertices):
-            if matriz_adjacencia[i][j] == 1:
-                grau += 1
-        graus.append(grau)
-
-    dados_tabela = []
-    for idx, grau in enumerate(graus):
-        dados_tabela.append([f'{idx}', grau])
-
-    dados_tabela.sort(key=lambda x: x[1], reverse=True)
-    #Retornará os 3 principais vértices
-    #dados_tabela = dados_tabela[:3]
-    return dados_tabela
-
-def vert_inicial(grafo):
-    sg.theme('Reddit')
-    # Dados da tabela (vértices e graus)
-    dados_tabela = calcular_grau_vertice(grafo)
-
-    # Layout da janela
-    layout = [
-        [sg.Table(values=dados_tabela, headings=['Vértice', 'Grau'], auto_size_columns=True, key='-TABLE-')],
-        [sg.Text("Quanto maior o grau mais eficiente a busca", key='-MESSAGE-')],
-        [sg.Text('Selecione um item:'), sg.Combo(values=[row[0] for row in dados_tabela], key='-COMBO-')],
-        [sg.Button('OK'), sg.Button('Cancelar')]
-    ]
-
-    window = sg.Window('Interface', layout)
-
-    while True:
-        event, values = window.read()
-
-        if event == sg.WIN_CLOSED or event == 'Cancelar':
-            break
-
-        if event == 'OK':
-            selected_vertex = values['-COMBO-']
-            break
-
-    window.close()
-    return int(selected_vertex)
-
-def criar_grafo(matriz_adjacencia):
-    G_pgv = pgv.AGraph(strict=True, directed=False, rankdir='BT')
-    G_pgv.node_attr.update({'style': 'filled', 'shape': 'circle', 'width': '0.44', 'height': '0.44','fixedsize' : 'True'})
-    arestas = []
-
-    for i in range(len(matriz_adjacencia)):
-        G_pgv.add_node(i)
-
-    for i in range(len(matriz_adjacencia)):
-        for j in range(i + 1, len(matriz_adjacencia[i])):
-            if matriz_adjacencia[i][j] == 1:
-                G_pgv.add_edge(i, j)
-                arestas.append((i,j))
-                print("arestas na função: ",arestas)
-
-    G_pgv.layout(prog='neato')
-    G_pgv.draw('grafo/grafo.png')
-    return G_pgv
-
-#! Mudar para receber o grafo e fazer as mudanças
 def atualizar_grafo(G_pgv = None, no_atual=None, no_visitados=None, arestas_visitadas=None,
                           aresta_pintada=None):
     
@@ -142,35 +56,35 @@ def atualizar_grafo(G_pgv = None, no_atual=None, no_visitados=None, arestas_visi
 
     #return G_pgv
 
-import pygraphviz as pgv
 
 def colocar_arv(arvore, pai, filho, cor="black"):
     # Criar um novo gráfico
-
-    if pai == None:
-        arvore.add_node(filho)
+    if arvore is not None:
+        if pai == None:
+            arvore.add_node(filho)
+        
+        elif str(pai) in arvore.nodes() and str(filho) in arvore.nodes():
+            arvore.add_edge(pai, filho, color=cor, constraint = False)
+        else:
+            arvore.add_node(pai)
+            arvore.add_node(filho)
+            arvore.add_edge(pai, filho, color=cor)
     
-    elif str(pai) in arvore.nodes() and str(filho) in arvore.nodes():
-        arvore.add_edge(pai, filho, color=cor, constraint = False)
+        arvore.graph_attr.update(rankdir='TB')
+        arvore.node_attr.update(style='filled', shape='circle', width='0.3', height='0.3', fixedsize='True', color='lightblue')
+        arvore.edge_attr.update(penwidth='3.0')
+        arvore.layout(prog='dot')
+        
+
+        # Salvar o gráfico em um arquivo de imagem
+        arvore.draw('grafo/arvore.png')
+
+        return arvore
     else:
-        arvore.add_node(pai)
-        arvore.add_node(filho)
-        arvore.add_edge(pai, filho, color=cor)
-
-    arvore.graph_attr.update(rankdir='TB')
-    arvore.node_attr.update(style='filled', shape='circle', width='0.3', height='0.3', fixedsize='True', color='lightblue')
-    arvore.edge_attr.update(penwidth='3.0')
-
-        # Layout
-    arvore.layout(prog='dot')    
-
-    # Salvar o gráfico em um arquivo de imagem
-    arvore.draw('grafo/arvore.png')
-
-    return arvore
+        return None
 
 
-def buscar_em_largura(window,G_pgv,caminho_imagem, vertices_visitados, vertice_inicial=None,arvore = None, ):
+def buscar_em_largura(G_pgv,caminho_imagem,vertices, vertices_visitados, arestas_irmao,arestas_primo,arestas_pai,arestas_tio,window = None, vertice_inicial=0,arvore = None, ):
     #Declarando variáveis
     arestas = []
     arestas_visitadas = list()
@@ -208,9 +122,10 @@ def buscar_em_largura(window,G_pgv,caminho_imagem, vertices_visitados, vertice_i
     fila = deque([vertices[vertice_inicial]])
     vertices[vertice_inicial].marcado = True
     vertices[vertice_inicial].nivel_na_arvore = 1  # Vértice raiz da árvore de busca
-    vertices_enfileirados.append(vertices[vertice_inicial].numero)
+    if window:
+        vertices_enfileirados.append(vertices[vertice_inicial].numero)
     vertices_visitados.append(vertices[vertice_inicial].numero)
-
+    
     colocar_arv(arvore, None, vertice_inicial)
     vertices[vertice_inicial].numero_pai = None
     print(vertices[vertice_inicial].nivel_na_arvore)
@@ -233,7 +148,8 @@ def buscar_em_largura(window,G_pgv,caminho_imagem, vertices_visitados, vertice_i
                 vertices[vizinho].marcado = True
                 # Adiciona na fila
                 fila.append(vertices[vizinho])
-                vertices_enfileirados.append(vertices[vizinho].numero)
+                if window:
+                    vertices_enfileirados.append(vertices[vizinho].numero)
                 vertices_visitados.append(vertices[vizinho].numero)
 
                 arestas_pai.append(aresta_escolhida)
@@ -244,13 +160,14 @@ def buscar_em_largura(window,G_pgv,caminho_imagem, vertices_visitados, vertice_i
                 print("Adicionando pai do ", vertices[vizinho].numero ,"Como ",vertices[vizinho].numero_pai)
                 vertices[vizinho].nivel_na_arvore = vertice_atual.nivel_na_arvore + 1
 
-                atualizar_grafo(G_pgv, vertice_atual.numero, vertices_visitados,
-                                      arestas_visitadas, aresta_escolhida)  # Gera imagem
-                window["-TEXT-"].update(f'Fila: {vertices_enfileirados}')
-                window['-IMAGE-'].update(f'{caminho_imagem}')
-                window['-IMAGE2-'].update(f'{"grafo/arvore.png"}')
-                window.refresh()
-                time.sleep(0.5)
+                if window:
+                    atualizar_grafo(G_pgv, vertice_atual.numero, vertices_visitados,
+                                        arestas_visitadas, aresta_escolhida)  # Gera imagem
+                    window["-TEXT-"].update(f'Fila: {vertices_enfileirados}')
+                    window['-IMAGE-'].update(f'{caminho_imagem}')
+                    window['-IMAGE2-'].update(f'{"grafo/arvore.png"}')
+                    window.refresh()
+                    time.sleep(0.5)
             else:
                 # Se estiver marcado e estiver na fila
                 if vertices[vizinho] in fila:
@@ -274,158 +191,63 @@ def buscar_em_largura(window,G_pgv,caminho_imagem, vertices_visitados, vertice_i
                     else:
                         arestas_tio.append(aresta_escolhida)
                         colocar_arv(arvore, vertice_atual.numero, vertices[vizinho].numero, "DarkMagenta")
-
-                    atualizar_grafo(G_pgv, vertice_atual.numero, vertices_visitados,
-                                          arestas_visitadas, aresta_escolhida)  # Gera imagem
-                    window["-TEXT-"].update(f'Fila: {vertices_enfileirados}')
-                    window['-IMAGE-'].update(f'{caminho_imagem}')
-                    window['-IMAGE2-'].update(f'{"grafo/arvore.png"}')
-                    window.refresh()
-                    time.sleep(1)
+                    
+                    if window:
+                        atualizar_grafo(G_pgv, vertice_atual.numero, vertices_visitados,
+                                            arestas_visitadas, aresta_escolhida)  # Gera imagem
+                        window["-TEXT-"].update(f'Fila: {vertices_enfileirados}')
+                        window['-IMAGE-'].update(f'{caminho_imagem}')
+                        window['-IMAGE2-'].update(f'{"grafo/arvore.png"}')
+                        window.refresh()
+                        time.sleep(1)
                 # Caso já esteja marcado e fora da fila não fará nada
                 # Tanto que tlvz possa até tirar o else e todo bloco de código dele
-                else:
+                elif window:
                     atualizar_grafo(G_pgv, vertice_atual.numero, vertices_visitados,
-                                          arestas_visitadas)  # Gera imagem
+                                        arestas_visitadas)  # Gera imagem
                     window['-IMAGE-'].update(f'{caminho_imagem}')
                     window["-IMAGE2-"].update(filename="grafo/arvore.png")
                     window.refresh()
                     time.sleep(0.5)
         # Remove da fila
-        vertices_enfileirados.pop(0)
-        window["-TEXT-"].update(f'Fila: {vertices_enfileirados}')
+        
+
+        if window:
+            vertices_enfileirados.pop(0)
+            window["-TEXT-"].update(f'Fila: {vertices_enfileirados}')
 
     # Como se repete enquanto houver uma fila irá visitar todos os vértices sequencialmente
 
-    atualizar_grafo(G_pgv, vertice_atual.numero, vertices_visitados,
-                          arestas_visitadas)  # Gera imagem
-    window["-TEXT-"].update(f'Fila: {vertices_enfileirados}')
-    window['-IMAGE-'].update(f'{caminho_imagem}')
-    window["-IMAGE2-"].update(filename="grafo/arvore.png")
-    window.refresh()
+    if window:
+        atualizar_grafo(G_pgv, vertice_atual.numero, vertices_visitados,
+                            arestas_visitadas)  # Gera imagem
+        window["-TEXT-"].update(f'Fila: {vertices_enfileirados}')
+        window['-IMAGE-'].update(f'{caminho_imagem}')
+        window["-IMAGE2-"].update(filename="grafo/arvore.png")
+        window.refresh()
     # time.sleep(1)
     G_conn = isConnect(vertices_visitados,num_vertices)
     
     if (not G_conn):
         print ("O grafo é conexo")
+        return False
     else:
         print ("O grafo possui as componente ",G_conn," Desconexas")
-        buscar_em_largura(window, G_pgv,caminho_imagem, vertices_visitados, G_conn[0], arvore)
-    print(vertices)
+        
+        buscar_em_largura( G_pgv,caminho_imagem, vertices,vertices_visitados,arestas_irmao,arestas_primo,
+                          arestas_pai,arestas_tio,window, G_conn[0], arvore)
+        print(vertices)
+        return True
         
     
 
-def isConnect (vertices_comp,vertices_totais):
 
-    print("Todas vert",vertices_totais,vertices_comp)
-
-    vertices_comp = set (vertices_comp)
-    vertices_totais = set (vertices_totais)
-
-    resultado = vertices_totais - vertices_comp 
-    print ("Resultado", resultado)
-    print(vertices_totais, vertices_comp)
-    return list(resultado)
 
 #! Essa função pode recolorir a árvore ou o grafo ou ambos, acho interessante recolorir ambos
 #! Para recolorir o grafo primeiro será necessário colorir ó de gray e dps pode se usar duas cores uma pra cada conjunto
 #! A função pode ser feita simplesmente pintando os vértices vizinho de cor diferente dos vértices atuais
 #! Enquanto o ciclo impar pode ser pintado da mesma cor
-def isBipart (arvore = None, G_pgv = None):
 
-    def draw_nodes(nodes, color, G_pgv = None, arvore = None):
-            for node in nodes:
-                if G_pgv:
-                    pgv_node = G_pgv.get_node(node)
-                    pgv_node.attr['color'] = color
-                    G_pgv.draw('grafo/G_bipart.png')
-                if arvore:
-                    pgv_node = arvore.get_node(node)
-                    pgv_node.attr['color'] = color
-
-        # Layout
-                    arvore.draw('grafo/arvoreG.png')
-    
-    if arestas_irmao or arestas_primo:
-        print("O grafo não é bipartido e um ciclo ímpar será pintado")
-        print(vertices)
-        arestas_special = list()
-        ciclo_impar = list()
-        
-        if arestas_irmao is not None:
-            arestas_special.extend(arestas_irmao)
-        
-        if arestas_primo is not None:
-            arestas_special.extend(arestas_primo)
-        
-        verticeA = None
-        verticeB = None
-        
-        for v in vertices:
-            if v.numero == arestas_special[0][0]:
-                verticeA = v
-                
-            if v.numero == arestas_special[0][1]:
-                verticeB = v    
-    
-        print("Passando pelo for nenhum vértice é igual: ",arestas_special[0][0],arestas_special[0][1])
-        ciclo_impar.append(verticeA.numero)
-        ciclo_impar.append(verticeB.numero)
-        while verticeA.numero_pai != verticeB.numero_pai:
-            print(ciclo_impar)
-            print("Vertice A numero: ",verticeA.numero)
-            print("Vertice B numero: ",verticeB.numero)
-            for v in vertices:
-                if v.numero == verticeA.numero_pai:
-                    verticeA = v
-                    break
-            for v in vertices:
-                if v.numero == verticeB.numero_pai:
-                    verticeB = v
-                    break
-            print("Vertice A numero: ",verticeA.numero)
-            print("Vertice B numero: ",verticeB.numero)
-            ciclo_impar.append(verticeA.numero)
-            ciclo_impar.append(verticeB.numero)
-        ciclo_impar.append(verticeA.numero_pai)
-        print("Pai: ",verticeA.numero_pai, verticeB.numero_pai)
-            
-
-        print(ciclo_impar)
-        
-        draw_nodes(ciclo_impar,'yellow',G_pgv, arvore)
-        verticeA = None
-        verticeB = None
-        ciclo_impar.clear()
-        arestas_special.clear()
-
-
-    else:
-        groupA = list()
-        groupB = list()
-
-        print("O grafo é bipartido e a árvore será recolorido em 2 cores diferentes")
-
-        for v in vertices:
-            if v.numero not in groupA and v.numero not in groupB:
-                groupA.append(v.numero)
-                stack = [v.numero]
-
-                while stack:
-                    current = stack.pop()
-
-                    for adj in vertices[current].adjacencia:
-                        if adj not in groupA and adj not in groupB:
-                            # Adiciona aos grupos alternadamente
-                            if current in groupA:
-                                groupB.append(adj)
-                            else:
-                                groupA.append(adj)
-                            stack.append(adj)
-        
-        print("Grupo A : ",groupA,"Grupo B: ",groupB)
-        draw_nodes(groupA,'yellow',G_pgv,arvore)
-        draw_nodes(groupB,'pink',G_pgv,arvore)
     
         
         
@@ -433,28 +255,25 @@ def isBipart (arvore = None, G_pgv = None):
 
 #! Mudar a direção dos dados do grafo para sua horizontal, pois os grafos tendem a ser desenhados verticalmente
 #! Ocupando grande parte da janela
-def interface_buscaLarg(grafo):
+def interface_buscaLarg(G_pgv, matriz_adjacencia):
     global vertices_enfileirados
 
     #! Variáveis para guardar os dados se necessário
     global arestas_pai
-    global arestas_primo
     global arestas_tio
-    global arestas_irmao
-    global vertices
     global componentes
-
-    matriz_adjacencia = grafo
 
     caminho_imagem = caminho_imagem = "grafo/grafo.png"
     sg.theme('Reddit')
 
     arvore = pgv.AGraph(strict=True)
 
+            # Layout
+    arvore.layout(prog='dot')
+
     #O nó só está sendo adicionado para que crie a arvoré caso não exista e para que faça um nova arvoré limpa
     # Por isso a arvore é limpa logo em seguida
-    colocar_arv(arvore,None,0)
-    arvore.clear()
+    arvore.draw('grafo/arvore.png')
 
     componentes = 0
 
@@ -538,8 +357,8 @@ def interface_buscaLarg(grafo):
             vertices_enfileirados.clear()
             vertices_visitados.clear()
             vertice_inicial = vert_inicial(matriz_adjacencia)
-            G_pgv = criar_grafo(matriz_adjacencia)
-            buscar_em_largura(window, G_pgv,caminho_imagem , vertices_visitados, vertice_inicial, arvore)
+            buscar_em_largura( G_pgv,caminho_imagem ,vertices, vertices_visitados,
+                              arestas_irmao,arestas_primo, arestas_pai,arestas_tio,window, vertice_inicial, arvore)
             
             print("Saiu",vertices)
             print(arestas_primo,arestas_irmao)
@@ -548,9 +367,10 @@ def interface_buscaLarg(grafo):
 
             # talvez retorna o vértice o qual a bipartição é nula
             window.Refresh()
+
         if event == 'Mostrar bipartição':
             print("A bipartição será mostrada recolorindo a árvore")
-            isBipart(arvore,G_pgv)
+            isBipart(vertices, arestas_irmao, arestas_primo, arvore, G_pgv)
             arvore.clear()
             window["-IMAGE2-"].update(filename="grafo/arvoreG.png")
             window["-IMAGE-"].update(filename="grafo/G_bipart.png")

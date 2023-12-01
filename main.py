@@ -2,7 +2,7 @@ import PySimpleGUI as sg
 
 # ! Gera o grafo e o salva como imagem
 from lerGrafo import interface_lerGrafo
-from buscaLarg import *
+from buscaLarg import interface_buscaLarg, buscar_em_largura
 from funGrafo import *
 
 
@@ -19,7 +19,7 @@ from funGrafo import *
 def main():
     # Caminho predefinido da imagem
     caminho_imagem = "grafo/grafo.png"
-    grafo_selecionado = interface_lerGrafo()
+    G_pgv, grafo_selecionado = interface_lerGrafo()
     sg.theme('Reddit')
 
     # Layout da interface
@@ -45,17 +45,25 @@ def main():
         
         if event == 'Verificar se é conexo':
             print("Será feita " ,event)
-            G_connect_interface(grafo_selecionado)
+            #G_connect_interface(grafo_selecionado)
+            arestas_irmao = list()
+            arestas_primo = list()
+            vertices = list()
+            vertices_visitado= list()
+            arestas_pai = list()
+            arestas_tio = list()
+            if buscar_em_largura(G_pgv,"grafo/grafo.png",vertices,vertices_visitado,arestas_irmao,arestas_primo,arestas_pai,arestas_tio):
+                print ("O grafo é desconexo")
 
         if event == 'Aplicar busca em largura':
 
-            interface_buscaLarg(grafo_selecionado)
+            interface_buscaLarg(G_pgv, grafo_selecionado)
 
         if event == 'Mostrar bipartição do grafo':
-            buscar_em_largura
+            print("Será feita")
 
         if event == 'Escolher outro grafo':
-            grafo_selecionado = interface_lerGrafo()
+            G_pgv, grafo_selecionado = interface_lerGrafo()
             window["-IMAGE-"].update(filename=caminho_imagem)
             window.refresh()
 
