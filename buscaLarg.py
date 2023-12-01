@@ -13,6 +13,9 @@ from funGrafo import *
 
 # ! Tentar fazer com que sair no meio do programa não mostre a tela de morte
 
+# ! Tlvz seja possível retirar a repetição de definição de listas
+#!Visto que no python as alterações em listas dentro de funções são globais
+
 def atualizar_grafo(G_pgv = None, no_atual=None, no_visitados=None, arestas_visitadas=None,
                           aresta_pintada=None):
     
