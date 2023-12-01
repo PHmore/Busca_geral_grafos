@@ -29,7 +29,7 @@ import pygraphviz as pgv
 
 # ! Tentar fazer com que sair no meio do programa não mostre a tela de morte
 
-
+#! A algum erro ao recolorir bipartição do grafo árvore
 
 def calcular_grau_vertice(matriz_adjacencia):
     graus = []
@@ -341,13 +341,9 @@ def isBipart (arvore = None, G_pgv = None):
                     G_pgv.draw('grafo/G_bipart.png')
                 if arvore:
                     pgv_node = arvore.get_node(node)
-                    #pgv_node.attr['color'] = color
-                    arvore.graph_attr.update(rankdir='TB')
-                    arvore.node_attr.update(style='filled', shape='circle', width='0.3', height='0.3', fixedsize='True', color=color)
-                    arvore.edge_attr.update(penwidth='3.0')
+                    pgv_node.attr['color'] = color
 
         # Layout
-                    arvore.layout(prog='dot')
                     arvore.draw('grafo/arvoreG.png')
     
     if arestas_irmao or arestas_primo:
