@@ -52,8 +52,12 @@ def main():
             vertices_visitado= list()
             arestas_pai = list()
             arestas_tio = list()
-            if buscar_em_largura(G_pgv,"grafo/grafo.png",vertices,vertices_visitado,arestas_irmao,arestas_primo,arestas_pai,arestas_tio):
-                print ("O grafo é desconexo")
+            componentes = list()
+            buscar_em_largura(G_pgv,"grafo/grafo.png",vertices,vertices_visitado,arestas_irmao,arestas_primo,arestas_pai,arestas_tio,None,0,None,componentes)
+            print ("Main componentes",componentes)
+            draw_components(G_pgv,componentes)
+            window["-IMAGE-"].update(filename="grafo/grafo.png")
+
 
         if event == 'Aplicar busca em largura':
 

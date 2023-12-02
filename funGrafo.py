@@ -1,5 +1,6 @@
 import PySimpleGUI as sg
-from lerGrafo import criar_grafo
+
+#importação usada em busca em largura
 from Vertice import Vertice
 #from buscaLarg import interface_buscaLarg
 
@@ -57,13 +58,14 @@ def vert_inicial(grafo):
     window.close()
     return int(selected_vertex)
 
-def isConnect (vertices_encontrados,vertices_totais):
+def isConnect (vertices_encontrados,vertices_totais,componente = []):
 
     print("Todas vert",vertices_totais,vertices_encontrados)
 
     vertices_encontrados = set (vertices_encontrados)
     vertices_totais = set (vertices_totais)
-
+    nova_componente = list(vertices_encontrados - set(sum(componente, [])))
+    componente.append(nova_componente)
     resultado = vertices_totais - vertices_encontrados 
     print ("Resultado", resultado)
     print(vertices_totais, vertices_encontrados)
@@ -177,4 +179,25 @@ def isBipart (vertices,arestas_irmao, arestas_primo,arvore = None, G_pgv = None)
         print("Grupo A : ",groupA,"Grupo B: ",groupB)
         draw_bipart(groupA,'yellow',G_pgv,arvore)
         draw_bipart(groupB,'pink',G_pgv,arvore)
+
+def draw_components(G_pgv,componentes):
+    colors = ['green','blue','pink','orange','violet']
+
+
+    def draw_nodes(nodes, color, G = G_pgv):
+        for node in nodes:
+            pgv_node = G.get_node(node)
+            pgv_node.attr['color'] = color
+
+    #i = 0
+
+    for componente in componentes:
+        #print("Componente única",componente)
+        draw_nodes(componente,colors.pop(),G_pgv)
+
+        #draw_nodes(componente,colors[i],G_pgv)
+        #i+=1;
+        
+    
+    G_pgv.draw('grafo/grafo.png')
 

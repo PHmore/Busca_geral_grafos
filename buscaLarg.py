@@ -9,12 +9,26 @@ from collections import deque
 import pygraphviz as pgv
 from funGrafo import *
 
+
 # usando set para cada componente e comporando a quantidade de vértices encontrados com a quantidade de nós totais
 
 # ! Tentar fazer com que sair no meio do programa não mostre a tela de morte
 
 # ! Tlvz seja possível retirar a repetição de definição de listas
 #!Visto que no python as alterações em listas dentro de funções são globais
+
+#Consertar
+def zerar_cor_grafo(G_pgv):
+    print("Será feita a recoloração do grafo e arestas para gray e black")
+
+    # Atribuir cor 'gray' para os nós
+    for node in G_pgv.nodes():
+        node.attr['color'] = 'gray'
+
+    # Atribuir cor 'black' para as arestas
+    for edge in G_pgv.edges():
+        edge.attr['color'] = 'black'
+
 
 def atualizar_grafo(G_pgv = None, no_atual=None, no_visitados=None, arestas_visitadas=None,
                           aresta_pintada=None):
@@ -27,11 +41,11 @@ def atualizar_grafo(G_pgv = None, no_atual=None, no_visitados=None, arestas_visi
 
     # Se houverem arestas visitadas, desenha-as em vermelho
     if arestas_visitadas:
-        draw_edges(arestas_visitadas, 'red', 2.0)
+        draw_edges(arestas_visitadas, 'red', 3.0)
 
     # Se houver uma aresta pintada, desenha-a em verde
     if aresta_pintada:
-        draw_edges([aresta_pintada], 'green', 2.0)
+        draw_edges([aresta_pintada], 'green', 3.0)
 
     def draw_nodes(nodes, color, G = G_pgv):
         for node in nodes:
@@ -87,7 +101,7 @@ def colocar_arv(arvore, pai, filho, cor="black"):
         return None
 
 
-def buscar_em_largura(G_pgv,caminho_imagem,vertices, vertices_visitados, arestas_irmao,arestas_primo,arestas_pai,arestas_tio,window = None, vertice_inicial=0,arvore = None, ):
+def buscar_em_largura(G_pgv,caminho_imagem,vertices, vertices_visitados, arestas_irmao,arestas_primo,arestas_pai,arestas_tio,window = None, vertice_inicial=0,arvore = None,componentes = [] ):
     #Declarando variáveis
     arestas = []
     arestas_visitadas = list()
@@ -229,7 +243,8 @@ def buscar_em_largura(G_pgv,caminho_imagem,vertices, vertices_visitados, arestas
         window["-IMAGE2-"].update(filename="grafo/arvore.png")
         window.refresh()
     # time.sleep(1)
-    G_conn = isConnect(vertices_visitados,num_vertices)
+    G_conn = isConnect(vertices_visitados,num_vertices,componentes)
+    print("COMPONENTES AQUI",componentes)
     
     if (not G_conn):
         print ("O grafo é conexo")
@@ -238,7 +253,7 @@ def buscar_em_largura(G_pgv,caminho_imagem,vertices, vertices_visitados, arestas
         print ("O grafo possui as componente ",G_conn," Desconexas")
         
         buscar_em_largura( G_pgv,caminho_imagem, vertices,vertices_visitados,arestas_irmao,arestas_primo,
-                          arestas_pai,arestas_tio,window, G_conn[0], arvore)
+                          arestas_pai,arestas_tio,window, G_conn[0], arvore,componentes)
         print(vertices)
         return True
         
@@ -246,7 +261,6 @@ def buscar_em_largura(G_pgv,caminho_imagem,vertices, vertices_visitados, arestas
 
 
 
-#! Essa função pode recolorir a árvore ou o grafo ou ambos, acho interessante recolorir ambos
 #! Para recolorir o grafo primeiro será necessário colorir ó de gray e dps pode se usar duas cores uma pra cada conjunto
 #! A função pode ser feita simplesmente pintando os vértices vizinho de cor diferente dos vértices atuais
 #! Enquanto o ciclo impar pode ser pintado da mesma cor
@@ -274,8 +288,6 @@ def interface_buscaLarg(G_pgv, matriz_adjacencia):
     #O nó só está sendo adicionado para que crie a arvoré caso não exista e para que faça um nova arvoré limpa
     # Por isso a arvore é limpa logo em seguida
     arvore.draw('grafo/arvore.png')
-
-    componentes = 0
 
     arestas_primo = list() 
     arestas_tio = list()
@@ -348,7 +360,7 @@ def interface_buscaLarg(G_pgv, matriz_adjacencia):
             window.Refresh()
 
         if event == 'Busca':
-            
+    
             arestas_primo.clear()
             arestas_tio.clear()
             arestas_pai.clear()
@@ -357,6 +369,8 @@ def interface_buscaLarg(G_pgv, matriz_adjacencia):
             vertices_enfileirados.clear()
             vertices_visitados.clear()
             vertice_inicial = vert_inicial(matriz_adjacencia)
+            arvore.clear()
+            zerar_cor_grafo(G_pgv)
             buscar_em_largura( G_pgv,caminho_imagem ,vertices, vertices_visitados,
                               arestas_irmao,arestas_primo, arestas_pai,arestas_tio,window, vertice_inicial, arvore)
             
