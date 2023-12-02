@@ -1,49 +1,89 @@
 import PySimpleGUI as sg
-
-# ! Gera o grafo e o salva como imagem
 from lerGrafo import interface_lerGrafo
-from lerGrafo import gerar_imagem_do_grafo
+from buscaLarg import interface_buscaLarg, buscar_em_largura
+from funGrafo import *
 
-# ! Exibir e mostrar opções doq fazer com o grafo
+#!Pode se considerar o código como feito só falta ajeitar momentos onde a janela morre
+#!momentos esse que dependem do fluxo do usuário
+
+#? Para encontrar bipartição no grafo apartir de uma aresta especial
+#? Pode se pegar igualar o nível dos vértices e subir a árvore até a aresta a,b possuirem o mesmo pai
+#? Fazer esse processo recolorindo os nós pelo caminho resultará em teoria em um ciclo impar
+#? Portanto tentar implementar posteriomente
+
 def main():
     # Caminho predefinido da imagem
     caminho_imagem = "grafo/grafo.png"
-    interface_lerGrafo()
+    G_pgv, grafo_selecionado = interface_lerGrafo()
+    sg.theme('Reddit')
 
     # Layout da interface
     layout = [
-        [sg.Image(key="-IMAGE-")],
-        [sg.Push(), sg.Button('Verificar se é conexo',size=(20, 1), button_color=('white', 'DarkGreen')), sg.Push()
-        , sg.Button('Aplicar busca em largura',size=(20, 1), button_color=('white', 'DarkGreen')), sg.Push()
-        , sg.Button('Mostrar bipartição do grafo',size=(20, 1), button_color=('white', 'DarkGreen')), sg.Push()],
+        [sg.Image(filename=caminho_imagem,key="-IMAGE-")],
+        [sg.HSeparator()],
         [sg.Push()],
-        [sg.Push(), sg.Button('Escolher outro grafo',size=(20, 1), button_color=('white', 'DarkBlue')), sg.Push()],
-        [sg.Push(), sg.Button('Sair',size=(20, 1), button_color=('white', 'DarkRed')), sg.Push()]
+        [sg.Push(), sg.Button('Verificar se é conexo',size=(20, 1), button_color=('white', 'DarkGreen')),
+         sg.Push(), sg.Button('Aplicar busca em largura',size=(20, 1), button_color=('white', 'DarkGreen')),
+         sg.Push(), sg.Button('Mostrar bipartição do grafo',size=(20, 1),
+                              button_color=('white', 'DarkGreen')), sg.Push()],
+        [sg.Push()],
+        [sg.Push(), sg.Button('Escolher outro grafo', size=(20, 1), button_color=('white', 'DarkBlue')), sg.Push()],
+        [sg.Push(), sg.Button('Sair', size=(20, 1), button_color=('white', 'DarkRed')), sg.Push()]
     ]
 
     # Criar a janela
     window = sg.Window("Exibir Imagem", layout, resizable=True, finalize=True)
-
-    window["-IMAGE-"].update(filename=caminho_imagem)
     while True:
         event, values = window.read()
         if event == sg.WIN_CLOSED:
             break
         
         if event == 'Verificar se é conexo':
-            print("Será feita " ,event)
+            arestas_irmao = list()
+            arestas_primo = list()
+            vertices = list()
+            vertices_visitado= list()
+            arestas_pai = list()
+            arestas_tio = list()
+            componentes = list()
+            buscar_em_largura(G_pgv,"grafo/grafo.png",vertices,vertices_visitado,arestas_irmao,arestas_primo,arestas_pai,arestas_tio,None,0,None,componentes)
+    
+            draw_components(G_pgv,componentes)
+            if(len(componentes)==1):
+                print("\nO GRAFO É CONEXO")
+                print(componentes,"\n")
+            else:
+                print("\nO GRAFO É DESCONEXO E POSSUI: ",len(componentes)," COMPONENTES")
+                print(componentes,"\n")
+            window["-IMAGE-"].update(filename="grafo/grafo.png")
+
 
         if event == 'Aplicar busca em largura':
-            print("Será feita " ,event)
+
+            interface_buscaLarg(G_pgv, grafo_selecionado)
+            window["-IMAGE-"].update(filename="grafo/grafo.png")
 
         if event == 'Mostrar bipartição do grafo':
-            print("Será feita " ,event)
+            arestas_irmao = list()
+            arestas_primo = list()
+            vertices = list()
+            vertices_visitado= list()
+            arestas_pai = list()
+            arestas_tio = list()
+            buscar_em_largura(G_pgv,"grafo/grafo.png",vertices,vertices_visitado,
+                              arestas_irmao,arestas_primo,arestas_pai,arestas_tio)
+            isBipart(vertices, arestas_irmao, arestas_primo, None, G_pgv)
+            window["-IMAGE-"].update(filename="grafo/grafo.png")
 
         if event == 'Escolher outro grafo':
-            #mudar grafo
-            matriz_adjacencia_exemplo = interface_lerGrafo()
-            gerar_imagem_do_grafo(matriz_adjacencia_exemplo, "grafo/grafo.png")
-            window["-IMAGE-"].update(filename=caminho_imagem)
+            G_pgv2, grafo_selecionado2 = interface_lerGrafo()
+            if(G_pgv2 is not None):
+                window["-IMAGE-"].update(filename=caminho_imagem)
+                G_pgv = G_pgv2
+                grafo_selecionado = grafo_selecionado2
+                window.refresh()
+            else:
+                pass
 
         if event == 'Sair':
             break
