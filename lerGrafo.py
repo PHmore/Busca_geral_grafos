@@ -64,10 +64,14 @@ def interface_lerGrafo ():
             return None, None
 
         if event == 'OK':
-            matriz_selecionada = matrizes[values['-COMBO-']]
+            try:
+                matriz_selecionada = matrizes[values['-COMBO-']]
+            except:
+                matriz_selecionada = matrizes[0]
             break
 
     window.close()
+    
     
     G_pgv = criar_grafo(matriz_selecionada)
     return G_pgv, matriz_selecionada

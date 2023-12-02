@@ -3,6 +3,9 @@ from lerGrafo import interface_lerGrafo
 from buscaLarg import interface_buscaLarg, buscar_em_largura
 from funGrafo import *
 
+#!Pode se considerar o código como feito só falta ajeitar momentos onde a janela morre
+#!momentos esse que dependem do fluxo do usuário
+
 #? Para encontrar bipartição no grafo apartir de uma aresta especial
 #? Pode se pegar igualar o nível dos vértices e subir a árvore até a aresta a,b possuirem o mesmo pai
 #? Fazer esse processo recolorindo os nós pelo caminho resultará em teoria em um ciclo impar
@@ -44,8 +47,14 @@ def main():
             arestas_tio = list()
             componentes = list()
             buscar_em_largura(G_pgv,"grafo/grafo.png",vertices,vertices_visitado,arestas_irmao,arestas_primo,arestas_pai,arestas_tio,None,0,None,componentes)
-            #print ("Main componentes",componentes)
+    
             draw_components(G_pgv,componentes)
+            if(len(componentes)==1):
+                print("\nO GRAFO É CONEXO")
+                print(componentes,"\n")
+            else:
+                print("\nO GRAFO É DESCONEXO E POSSUI: ",len(componentes)," COMPONENTES")
+                print(componentes,"\n")
             window["-IMAGE-"].update(filename="grafo/grafo.png")
 
 

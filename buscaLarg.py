@@ -10,7 +10,7 @@ import os
 # Visto que no python as alterações em listas dentro de funções são globais
 
 def zerar_cor_grafo(G_pgv):
-
+    
     for node in G_pgv.nodes():
         node.attr['color'] = 'gray'
 
@@ -105,6 +105,7 @@ def buscar_em_largura(G_pgv,caminho_imagem,vertices, vertices_visitados, arestas
                     v.adjacencia.append(n[1])
                 elif n[1] == v.numero and n[0] not in v.adjacencia:
                     v.adjacencia.append(n[0])
+        v.adjacencia.sort()
 
     fila = deque([vertices[vertice_inicial]])
     vertices[vertice_inicial].marcado = True
@@ -213,6 +214,7 @@ def interface_buscaLarg(G_pgv, matriz_adjacencia):
     caminho_imagem = "grafo/grafo.png"
     sg.theme('Reddit')
 
+    zerar_cor_grafo(G_pgv)
     arvore = pgv.AGraph(strict=True)
     arvore.layout(prog='dot')
     arvore.draw('grafo/arvore.png')
@@ -305,6 +307,12 @@ def interface_buscaLarg(G_pgv, matriz_adjacencia):
                                 arestas_irmao,arestas_primo, arestas_pai,arestas_tio,window, vertice_inicial, arvore)
                 window['-COL-BPART-'].update(visible=True)
                 window['Mostrar bipartição'].update(visible=True)
+
+            
+            print("\nARESTAS PAI: ",arestas_pai)
+            print("ARESTAS TIO: ",arestas_tio)
+            print("ARESTAS IRMÃO: ",arestas_irmao)
+            print("ARESTAS PRIMO: ",arestas_primo,"\n")
 
 
         if event == 'Mostrar bipartição':

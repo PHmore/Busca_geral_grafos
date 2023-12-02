@@ -42,13 +42,18 @@ def vert_inicial(grafo):
 
         if event == sg.WIN_CLOSED:
             return -1
-
+        
         if event == 'OK':
+            
             selected_vertex = values['-COMBO-']
             break
+        
 
     window.close()
-    return int(selected_vertex)
+    try:
+        return int(selected_vertex)
+    except:
+        return 0
 
 def isConnect (vertices_encontrados,vertices_totais,componente = []):
 
@@ -58,6 +63,7 @@ def isConnect (vertices_encontrados,vertices_totais,componente = []):
     nova_componente = list(vertices_encontrados - set(sum(componente, [])))
     componente.append(nova_componente)
     resultado = vertices_totais - vertices_encontrados 
+
     return list(resultado)
 
 def isBipart (vertices,arestas_irmao, arestas_primo,arvore = None, G_pgv = None):
