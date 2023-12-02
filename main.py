@@ -1,15 +1,7 @@
 import PySimpleGUI as sg
-
-# ! Gera o grafo e o salva como imagem
 from lerGrafo import interface_lerGrafo
 from buscaLarg import interface_buscaLarg, buscar_em_largura
 from funGrafo import *
-
-
-# ! Exibir e mostrar opções doq fazer com o grafo
-
-#! Resolver problema do carregamento inicial de imagens e quando não existem imagens
-#! Necessário rever o uso de vertices infileirados pois o mesmo precisa existir
 
 #? Para encontrar bipartição no grafo apartir de uma aresta especial
 #? Pode se pegar igualar o nível dos vértices e subir a árvore até a aresta a,b possuirem o mesmo pai
@@ -44,8 +36,6 @@ def main():
             break
         
         if event == 'Verificar se é conexo':
-            print("Será feita " ,event)
-            #G_connect_interface(grafo_selecionado)
             arestas_irmao = list()
             arestas_primo = list()
             vertices = list()
@@ -54,7 +44,7 @@ def main():
             arestas_tio = list()
             componentes = list()
             buscar_em_largura(G_pgv,"grafo/grafo.png",vertices,vertices_visitado,arestas_irmao,arestas_primo,arestas_pai,arestas_tio,None,0,None,componentes)
-            print ("Main componentes",componentes)
+            #print ("Main componentes",componentes)
             draw_components(G_pgv,componentes)
             window["-IMAGE-"].update(filename="grafo/grafo.png")
 
@@ -62,9 +52,9 @@ def main():
         if event == 'Aplicar busca em largura':
 
             interface_buscaLarg(G_pgv, grafo_selecionado)
+            window["-IMAGE-"].update(filename="grafo/grafo.png")
 
         if event == 'Mostrar bipartição do grafo':
-            print("Será feita")
             arestas_irmao = list()
             arestas_primo = list()
             vertices = list()
@@ -74,7 +64,7 @@ def main():
             buscar_em_largura(G_pgv,"grafo/grafo.png",vertices,vertices_visitado,
                               arestas_irmao,arestas_primo,arestas_pai,arestas_tio)
             isBipart(vertices, arestas_irmao, arestas_primo, None, G_pgv)
-            window["-IMAGE-"].update(filename="grafo/G_bipart.png")
+            window["-IMAGE-"].update(filename="grafo/grafo.png")
 
         if event == 'Escolher outro grafo':
             G_pgv, grafo_selecionado = interface_lerGrafo()
