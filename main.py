@@ -67,9 +67,14 @@ def main():
             window["-IMAGE-"].update(filename="grafo/grafo.png")
 
         if event == 'Escolher outro grafo':
-            G_pgv, grafo_selecionado = interface_lerGrafo()
-            window["-IMAGE-"].update(filename=caminho_imagem)
-            window.refresh()
+            G_pgv2, grafo_selecionado2 = interface_lerGrafo()
+            if(G_pgv2 is not None):
+                window["-IMAGE-"].update(filename=caminho_imagem)
+                G_pgv = G_pgv2
+                grafo_selecionado = grafo_selecionado2
+                window.refresh()
+            else:
+                pass
 
         if event == 'Sair':
             break

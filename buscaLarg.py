@@ -2,6 +2,7 @@ import time
 from collections import deque
 import pygraphviz as pgv
 from funGrafo import *
+import os
 
 # ! Tentar fazer com que sair no meio do programa não mostre a tela de morte
 
@@ -280,13 +281,14 @@ def interface_buscaLarg(G_pgv, matriz_adjacencia):
         if event == sg.WIN_CLOSED or event == 'Sair':
             zerar_cor_grafo(G_pgv)
             break
+            
 
         if event == 'Read':
             window['-IN-'].update('')
             window.Refresh()
 
         if event == 'Busca':
-    
+
             arestas_primo.clear()
             arestas_tio.clear()
             arestas_pai.clear()
@@ -295,12 +297,15 @@ def interface_buscaLarg(G_pgv, matriz_adjacencia):
             vertices_enfileirados.clear()
             vertices_visitados.clear()
             vertice_inicial = vert_inicial(matriz_adjacencia)
-            arvore.clear()
-            zerar_cor_grafo(G_pgv)
-            buscar_em_largura( G_pgv,caminho_imagem ,vertices, vertices_visitados,
-                              arestas_irmao,arestas_primo, arestas_pai,arestas_tio,window, vertice_inicial, arvore)
-            window['-COL-BPART-'].update(visible=True)
-            window['Mostrar bipartição'].update(visible=True)
+
+            if vertice_inicial != -1:
+                arvore.clear()
+                zerar_cor_grafo(G_pgv)
+                buscar_em_largura( G_pgv,caminho_imagem ,vertices, vertices_visitados,
+                                arestas_irmao,arestas_primo, arestas_pai,arestas_tio,window, vertice_inicial, arvore)
+                window['-COL-BPART-'].update(visible=True)
+                window['Mostrar bipartição'].update(visible=True)
+
 
         if event == 'Mostrar bipartição':
             isBipart(vertices, arestas_irmao, arestas_primo, arvore, G_pgv)

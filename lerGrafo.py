@@ -61,7 +61,7 @@ def interface_lerGrafo ():
         event, values = window.read()
 
         if event == sg.WINDOW_CLOSED:
-            break
+            return None, None
 
         if event == 'OK':
             matriz_selecionada = matrizes[values['-COMBO-']]

@@ -32,7 +32,7 @@ def vert_inicial(grafo):
         [sg.Table(values=dados_tabela, headings=['Vértice', 'Grau'], auto_size_columns=True, key='-TABLE-')],
         [sg.Text("Quanto maior o grau mais eficiente a busca", key='-MESSAGE-')],
         [sg.Text('Selecione um item:'), sg.Combo(values=[row[0] for row in dados_tabela], key='-COMBO-')],
-        [sg.Button('OK'), sg.Button('Cancelar')]
+        [sg.Button('OK')]
     ]
 
     window = sg.Window('Interface', layout)
@@ -40,8 +40,8 @@ def vert_inicial(grafo):
     while True:
         event, values = window.read()
 
-        if event == sg.WIN_CLOSED or event == 'Cancelar':
-            break
+        if event == sg.WIN_CLOSED:
+            return -1
 
         if event == 'OK':
             selected_vertex = values['-COMBO-']
