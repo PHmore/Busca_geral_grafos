@@ -2,8 +2,6 @@ import time
 from collections import deque
 import pygraphviz as pgv
 from funGrafo import *
-import os
-
 # ! Tentar fazer com que sair no meio do programa não mostre a tela de morte
 
 # Tlvz seja possível retirar a repetição de definição de listas
@@ -84,7 +82,7 @@ def colocar_arv(arvore, pai, filho, cor="black"):
         return None
 
 
-def buscar_em_largura(G_pgv,caminho_imagem,vertices, vertices_visitados, arestas_irmao,arestas_primo,arestas_pai,arestas_tio,window = None, vertice_inicial=0,arvore = None,componentes = [] ):
+def buscar_em_largura(G_pgv,caminho_imagem,vertices, vertices_visitados, arestas_irmao,arestas_primo,arestas_pai,arestas_tio,window = None, vertice_inicial=0,arvore = None,componentes = [], sleep_t = 0.5 ):
     arestas = []
     arestas_visitadas = list()
 
@@ -144,7 +142,7 @@ def buscar_em_largura(G_pgv,caminho_imagem,vertices, vertices_visitados, arestas
                     window['-IMAGE-'].update(f'{caminho_imagem}')
                     window['-IMAGE2-'].update(f'{"grafo/arvore.png"}')
                     window.refresh()
-                    time.sleep(0.5)
+                    time.sleep(sleep_t)
             else:
                 if vertices[vizinho] in fila:
                     aresta_escolhida = (vertice_atual.numero, vizinho)
@@ -169,14 +167,14 @@ def buscar_em_largura(G_pgv,caminho_imagem,vertices, vertices_visitados, arestas
                         window['-IMAGE-'].update(f'{caminho_imagem}')
                         window['-IMAGE2-'].update(f'{"grafo/arvore.png"}')
                         window.refresh()
-                        time.sleep(0.5)
+                        time.sleep(sleep_t)
                 elif window:
                     atualizar_grafo(G_pgv, vertice_atual.numero, vertices_visitados,
                                         arestas_visitadas)
                     window['-IMAGE-'].update(f'{caminho_imagem}')
                     window["-IMAGE2-"].update(filename="grafo/arvore.png")
                     window.refresh()
-                    time.sleep(0.5)
+                    time.sleep(sleep_t)
 
         if window:
             vertices_enfileirados.pop(0)
@@ -197,7 +195,7 @@ def buscar_em_largura(G_pgv,caminho_imagem,vertices, vertices_visitados, arestas
     else:
         
         buscar_em_largura( G_pgv,caminho_imagem, vertices,vertices_visitados,arestas_irmao,arestas_primo,
-                          arestas_pai,arestas_tio,window, G_conn[0], arvore,componentes)
+                          arestas_pai,arestas_tio,window, G_conn[0], arvore,componentes,sleep_t)
         return True
 
     
@@ -304,7 +302,7 @@ def interface_buscaLarg(G_pgv, matriz_adjacencia):
                 arvore.clear()
                 zerar_cor_grafo(G_pgv)
                 buscar_em_largura( G_pgv,caminho_imagem ,vertices, vertices_visitados,
-                                arestas_irmao,arestas_primo, arestas_pai,arestas_tio,window, vertice_inicial, arvore)
+                                arestas_irmao,arestas_primo, arestas_pai,arestas_tio,window, vertice_inicial, arvore,[],1.0)
                 window['-COL-BPART-'].update(visible=True)
                 window['Mostrar bipartição'].update(visible=True)
 

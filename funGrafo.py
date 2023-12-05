@@ -153,8 +153,8 @@ def isBipart (vertices,arestas_irmao, arestas_primo,arvore = None, G_pgv = None)
                                 groupA.append(adj)
                             stack.append(adj)
         
-        draw_bipart(groupA,'yellow',G_pgv,arvore)
-        draw_bipart(groupB,'pink',G_pgv,arvore)
+        draw_bipart(groupA,'deepskyblue',G_pgv,arvore)
+        draw_bipart(groupB,'limegreen',G_pgv,arvore)
 
 def draw_components(G_pgv,componentes):
     colors = ['green','blue','pink','orange','violet']
