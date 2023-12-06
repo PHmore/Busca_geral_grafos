@@ -1,142 +1,187 @@
-# Aqui estarão as outras funções
-
-# Apresentar o grafo visualmente acima da opções
-
-# Verificar se é conexo
-
-'''
-Será retornado 1 caso seja conexo e será retornado NULL caso não seja
-Caso o usuário selecione a opção “1” o programa deve responder SIM, caso o grafo seja conexo,
-ou NÃO, caso o grafo seja desconexo. Na sequência devem ser apresentados os conjuntos
-correspondentes a cada componente conexa que o grafo possuir
-'''
+# Importa a biblioteca PySimpleGUI para criar interfaces gráficas e a biblioteca pygraphviz para manipulação de grafos
+import PySimpleGUI as sg
+import pygraphviz as pgv
+from Vertice import Vertice
 
 
-# Será calculado o grau para que os 3 de maior grau sejam candidatos a raiz
-def calcular_grau(grafo):
-    grau = {}
-
-    for vertice, vizinhos in grafo.items():
-        grau[vertice] = len(vizinhos)
-
-    return grau
-
-
-
-
-# Exibir o grau de cada vértice
-
-
-# Aplicar busca em largura
-
-
-# Encontrar bipartição
-"""
-7 – Caso o grafo seja bipartido, a opção 3 deve apresentar a bipartição do grafo, caso ele não seja
-bipartido, esta opção deve informar que é impossível encontrar a bipartição porque o grafo não é
-bipartido, em seguida apresentar o ciclo ímpar que há no grafo
-"""
-
-# !A implementação deve ser original, i.e. não usar bibliotecas prontas para efetuar as principais
-# !tarefas solicitadas;
-
-
-"""
-ALTERNATIVA de leitura dos vértices usando matriz de adjacência
-
+# Função para calcular o grau de cada vértice no grafo representado pela matriz de adjacência
 def calcular_grau_vertice(matriz_adjacencia):
     graus = []
     num_vertices = len(matriz_adjacencia)
 
+    # Calcula o grau de cada vértice somando os elementos da linha correspondente na matriz
     for i in range(num_vertices):
         grau = 0
         for j in range(num_vertices):
             if matriz_adjacencia[i][j] == 1:
                 grau += 1
         graus.append(grau)
-    print(graus)
-    return graus
 
-# Exemplo de uso
-matriz_adjacencia = [
-    [0, 1, 1, 0, 0],
-    [1, 0, 1, 1, 0],
-    [1, 1, 0, 1, 1],
-    [0, 1, 1, 0, 1],
-    [0, 0, 1, 1, 0]
-]
+    # Cria uma tabela com os vértices e seus respectivos graus, ordenada pelo grau decrescente
+    dados_tabela = []
+    for idx, grau in enumerate(graus):
+        dados_tabela.append([f'{idx}', grau])
+    dados_tabela.sort(key=lambda x: x[1], reverse=True)
 
-graus = calcular_grau_vertice(matriz_adjacencia)
-
-for i, grau in enumerate(graus):
-    print(f"O vértice {i+1} tem grau {grau}.")
-
-    
+    return dados_tabela
 
 
-def dfs(grafo, vertice, visitados):
-    visitados.add(vertice)
-    for vizinho in grafo[vertice]:
-        if vizinho not in visitados:
-            dfs(grafo, vizinho, visitados)
+# Função para selecionar um vértice inicial com base nos graus dos vértices
+def vert_inicial(grafo):
+    # Configuração do tema da interface gráfica
+    sg.theme('Reddit')
+    dados_tabela = calcular_grau_vertice(grafo)
 
-def grafo_desconexo(grafo):
-    visitados = set()
-    componente = 0
+    # Layout da janela para seleção do vértice inicial
+    layout = [
+        [sg.Table(values=dados_tabela, headings=['Vértice', 'Grau'], auto_size_columns=True, key='-TABLE-')],
+        [sg.Text("Quanto maior o grau mais eficiente a busca", key='-MESSAGE-')],
+        [sg.Text('Selecione um item:'), sg.Combo(values=[row[0] for row in dados_tabela], key='-COMBO-')],
+        [sg.Button('OK')]
+    ]
 
-    for vertice in grafo:
-        if vertice not in visitados:
-            componente += 1
-            dfs(grafo, vertice, visitados)
+    # Criação da janela
+    window = sg.Window('Interface', layout)
 
-    return componente > 1
+    while True:
+        event, values = window.read()
 
-# Exemplo de representação de um grafo como dicionário de adjacências
-grafo_exemplo = {
-    1: [2, 3],
-    2: [1],
-    3: [1],
-    4: [5],
-    5: [4]
-}
+        # Verifica se a janela foi fechada
+        if event == sg.WIN_CLOSED:
+            return -1
 
-if grafo_desconexo(grafo_exemplo):
-    print("O grafo é desconexo.")
-else:
-    print("O grafo é conexo.")
+        # Verifica se o botão OK foi pressionado
+        if event == 'OK':
+            selected_vertex = values['-COMBO-']
+            break
 
-"""
+    window.close()
 
-"""
-def dfs(grafo, vertice, visitados):
-    visitados.add(vertice)
-    for vizinho in grafo[vertice]:
-        if vizinho not in visitados:
-            dfs(grafo, vizinho, visitados)
+    try:
+        return int(selected_vertex)
+    except:
+        return 0
 
-def grafo_desconexo(grafo):
-    visitados = set()
-    componente = 0
 
-    for vertice in grafo:
-        if vertice not in visitados:
-            componente += 1
-            dfs(grafo, vertice, visitados)
+# Função para verificar se dois vértices estão conectados no grafo
+def isConnect(vertices_encontrados, vertices_totais, componente=[]):
+    vertices_encontrados = set(vertices_encontrados)
+    vertices_totais = set(vertices_totais)
+    nova_componente = list(vertices_encontrados - set(sum(componente, [])))
+    componente.append(nova_componente)
+    resultado = vertices_totais - vertices_encontrados
 
-    return componente > 1
+    return list(resultado)
 
-# Exemplo de representação de um grafo como lista de adjacência
-grafo_exemplo = {
-    1: [2, 3],
-    2: [1],
-    3: [1],
-    4: [5],
-    5: [4]
-}
 
-if grafo_desconexo(grafo_exemplo):
-    print("O grafo é desconexo.")
-else:
-    print("O grafo é conexo.")
+# Função para verificar se um grafo é bipartido e desenhar as partes
+def isBipart(vertices, arestas_irmao, arestas_primo, arvore=None, G_pgv=None):
+    def draw_bipart(nodes, color, G_pgv=None, arvore=None, arestas=None):
+        for node in nodes:
+            if G_pgv:
+                pgv_node = G_pgv.get_node(node)
+                pgv_node.attr['color'] = color
+                if arestas:
+                    for aresta in arestas:
+                        pgv_edge = G_pgv.get_edge(*aresta)
+                        pgv_edge.attr['color'] = color
+                G_pgv.draw('grafo/grafo.png')
+            if arvore:
+                pgv_node = arvore.get_node(node)
+                pgv_node.attr['color'] = color
+                arvore.draw('grafo/arvore.png')
 
-"""
+    if arestas_irmao or arestas_primo:
+        arestas_special = list()
+        ciclo_impar_arestas = list()
+        ciclo_impar = list()
+
+        if arestas_irmao is not None:
+            arestas_special.extend(arestas_irmao)
+
+        if arestas_primo is not None:
+            arestas_special.extend(arestas_primo)
+
+        verticeA = None
+        verticeB = None
+
+        for v in vertices:
+            if v.numero == arestas_special[0][0]:
+                verticeA = v
+
+            if v.numero == arestas_special[0][1]:
+                verticeB = v
+
+        ciclo_impar_arestas.append(arestas_special[0])
+        ciclo_impar.append(verticeA.numero)
+        ciclo_impar.append(verticeB.numero)
+
+        # Encontrando um ciclo ímpar na árvore
+        while verticeA.numero_pai != verticeB.numero_pai:
+            for v in vertices:
+                if v.numero == verticeA.numero_pai:
+                    ciclo_impar_arestas.append((verticeA.numero, v.numero))
+                    verticeA = v
+                    break
+            for v in vertices:
+                if v.numero == verticeB.numero_pai:
+                    ciclo_impar_arestas.append((verticeB.numero, v.numero))
+                    verticeB = v
+                    break
+            ciclo_impar.append(verticeA.numero)
+            ciclo_impar.append(verticeB.numero)
+
+        ciclo_impar.append(verticeA.numero_pai)
+        ciclo_impar_arestas.append((verticeB.numero, verticeA.numero_pai))
+        ciclo_impar_arestas.append((verticeA.numero, verticeA.numero_pai))
+
+        # Desenha o ciclo ímpar com cor amarela no grafo
+        draw_bipart(ciclo_impar, 'yellow', G_pgv, arvore, ciclo_impar_arestas)
+
+        verticeA = None
+        verticeB = None
+        ciclo_impar.clear()
+        arestas_special.clear()
+
+    else:
+        groupA = list()
+        groupB = list()
+
+        # Encontrando as partes bipartidas do grafo
+        for v in vertices:
+            if v.numero not in groupA and v.numero not in groupB:
+                groupA.append(v.numero)
+                stack = [v.numero]
+
+                while stack:
+                    current = stack.pop()
+
+                    for adj in vertices[current].adjacencia:
+                        if adj not in groupA and adj not in groupB:
+                            # Adiciona aos grupos alternadamente
+                            if current in groupA:
+                                groupB.append(adj)
+                            else:
+                                groupA.append(adj)
+                            stack.append(adj)
+
+        # Desenha as partes bipartidas com cores deepskyblue e limegreen no grafo
+        draw_bipart(groupA, 'deepskyblue', G_pgv, arvore)
+        draw_bipart(groupB, 'limegreen', G_pgv, arvore)
+
+
+# Função para desenhar componentes do grafo
+def draw_components(G_pgv, componentes):
+    colors = ['green', 'blue', 'pink', 'orange', 'violet']
+
+    # Função interna para desenhar os nós de um componente com uma cor específica
+    def draw_nodes(nodes, color, G=G_pgv):
+        for node in nodes:
+            pgv_node = G.get_node(node)
+            pgv_node.attr['color'] = color
+
+    for componente in componentes:
+        # Desenha cada componente com uma cor diferente no grafo
+        draw_nodes(componente, colors.pop(), G_pgv)
+
+    G_pgv.draw('grafo/grafo.png')
