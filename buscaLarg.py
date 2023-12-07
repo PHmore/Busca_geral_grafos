@@ -229,22 +229,22 @@ def interface_buscaLarg(G_pgv, matriz_adjacencia):
     layout = [
         [
             sg.Column([
-                [sg.Image(filename=caminho_imagem, key="-IMAGE-")],
-                [sg.Text(f'Fila: {vertices_enfileirados}', key="-TEXT-", font=("Ubuntu", 20))],
-                [sg.Text('Legenda de vértices:')],
-                [
-                    sg.Column([
+                        [sg.Text('Legenda de vértices:')],
                         [sg.Text('', background_color='green'), sg.Text('Em processo de visita ', pad=(0, 0))],
                         [sg.Text('', background_color='skyblue'), sg.Text('Marcado ', pad=(0, 0))],
-                        [sg.Text('', background_color='red'), sg.Text('Totalmente explorados ', pad=(0, 0))]
-                    ]),
-                    sg.Column([
+                        [sg.Text('', background_color='red'), sg.Text('Totalmente explorados ', pad=(0, 0))],
+                        [sg.Text(''), sg.Text(''), sg.Text(''), sg.Text('')],
                         [sg.Text('Legenda de arestas:')],
                         [sg.Text('', background_color='green'), sg.Text('Em processo de visita ', pad=(0, 0))],
                         [sg.Text('', background_color='red'), sg.Text('Visitadas ', pad=(0, 0))]
-                    ])
-                ]
+                    ],vertical_alignment='center'),
+
+            sg.Column([
+                [sg.Image(filename=caminho_imagem, key="-IMAGE-")],
+                [sg.Text(f'Fila: {vertices_enfileirados}', key="-TEXT-", font=("Ubuntu", 20))]
+                
             ]),
+
             sg.VSeparator(),
             sg.Column([
                 [sg.Text(f'Arvore', font=("Ubuntu", 20))],
@@ -255,7 +255,6 @@ def interface_buscaLarg(G_pgv, matriz_adjacencia):
                 [sg.Text('', background_color='DarkMagenta'), sg.Text('Tio ', pad=(0, 0))],
                 [sg.Text('', background_color='orange'), sg.Text('Primo ', pad=(0, 0))],
                 [sg.Text(''), sg.Text('')]
-                # Colocar mensagem embaixo da arvore falando se o grafo é conexo ou não
 
             ], vertical_alignment='center'),
             sg.Column([

@@ -1,15 +1,13 @@
 # Importa a biblioteca PySimpleGUI para criar interfaces gráficas
 import PySimpleGUI as sg
+
 # Importa funções e classes relacionadas à manipulação de grafos
 from lerGrafo import interface_lerGrafo
 from buscaLarg import interface_buscaLarg, buscar_em_largura
 from funGrafo import *
 
-#!Pode se considerar o código como feito só falta ajeitar momentos onde a janela morre
-#!momentos esse que dependem do fluxo do usuário
-
 #? Para encontrar bipartição no grafo apartir de uma aresta especial
-#? Pode se pegar igualar o nível dos vértices e subir a árvore até a aresta a,b possuirem o mesmo pai
+#? Pode se pegar os vértices que compõe a aresta irmã e prima e subir a árvore até a aresta a,b possuirem o mesmo pai
 #? Fazer esse processo recolorindo os nós pelo caminho resultará em teoria em um ciclo impar
 #? Portanto tentar implementar posteriomente
 
