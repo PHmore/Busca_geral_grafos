@@ -126,6 +126,7 @@ def isBipart (vertices,arestas_irmao, arestas_primo,arvore = None, G_pgv = None)
         ciclo_impar_arestas.append((verticeA.numero,verticeA.numero_pai))
         
         draw_bipart(ciclo_impar,'yellow',G_pgv, arvore,ciclo_impar_arestas)
+        print("Ciclo impar: ",ciclo_impar," Arestas do ciclo impar: ",ciclo_impar_arestas)
         verticeA = None
         verticeB = None
         ciclo_impar.clear()
@@ -155,9 +156,11 @@ def isBipart (vertices,arestas_irmao, arestas_primo,arvore = None, G_pgv = None)
         
         draw_bipart(groupA,'deepskyblue',G_pgv,arvore)
         draw_bipart(groupB,'limegreen',G_pgv,arvore)
+        print("Grupo A: ",groupA," Grupo B: ",groupB)
 
 def draw_components(G_pgv,componentes):
-    colors = ['green','blue','pink','orange','violet']
+    #Para pintar mais componentes terá que adicionar mais cores
+    colors = ['green','blue','red','orange','violet','purple']
 
 
     def draw_nodes(nodes, color, G = G_pgv):
