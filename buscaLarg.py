@@ -38,6 +38,7 @@ def atualizar_grafo(G_pgv=None, no_atual=None, no_visitados=None, arestas_visita
 
     try:
         if no_visitados is not None and vertices_enfileirados is not None:
+            #tira os nós visitados dos nós enfirelados para que sejam coloridos de forma diferente
             resultado = list(set(no_visitados) - set(vertices_enfileirados))
         else:
             resultado = None
@@ -64,6 +65,7 @@ def colocar_arv(arvore, pai, filho, cor="black"):
             arvore.add_node(filho)
 
         elif str(pai) in arvore.nodes() and str(filho) in arvore.nodes():
+            #Se o pai e o filho estiver na árvore cria uma aresta especial a qual não influência no layout
             arvore.add_edge(pai, filho, color=cor, constraint=False)
         else:
             arvore.add_node(pai)
@@ -93,6 +95,7 @@ def buscar_em_largura(G_pgv, caminho_imagem, vertices, vertices_visitados, arest
     arestas = list(G_pgv.edges())
     arestas = [(int(aresta[0]), int(aresta[1])) for aresta in arestas]
 
+    #função para ver a quantidade de vértices e inicializa-los
     num_vertices = list()
     for v in range(len(G_pgv.nodes())):
         num_vertices.append(v)
@@ -100,6 +103,7 @@ def buscar_em_largura(G_pgv, caminho_imagem, vertices, vertices_visitados, arest
             novo_no = Vertice(v, -1)
             vertices.append(novo_no)
 
+    #função para inicializar a vizinhança de cada vértice
     for v in vertices:
         for n in arestas:
             if v.numero in n:
@@ -109,9 +113,11 @@ def buscar_em_largura(G_pgv, caminho_imagem, vertices, vertices_visitados, arest
                     v.adjacencia.append(n[0])
         v.adjacencia.sort()
 
+    #adiciona e marca o vértice inicial
     fila = deque([vertices[vertice_inicial]])
     vertices[vertice_inicial].marcado = True
     vertices[vertice_inicial].nivel_na_arvore = 1
+
     if window:
         vertices_enfileirados.append(vertices[vertice_inicial].numero)
     vertices_visitados.append(vertices[vertice_inicial].numero)
@@ -119,19 +125,24 @@ def buscar_em_largura(G_pgv, caminho_imagem, vertices, vertices_visitados, arest
     colocar_arv(arvore, None, vertice_inicial)
     vertices[vertice_inicial].numero_pai = None
 
+    #Enquanto houver uma fila
     while fila:
         vertice_atual = fila.popleft()
 
+        #Para cada vizinho do vertice da fila
         for vizinho in vertice_atual.adjacencia:
+
+            #Se não tiver marcado será feito uma aresta pai
             if not vertices[vizinho].marcado:
                 aresta_escolhida = (vertice_atual.numero, vizinho)
                 arestas_visitadas.append(aresta_escolhida)
                 vertices[vizinho].marcado = True
                 fila.append(vertices[vizinho])
+
                 if window:
                     vertices_enfileirados.append(vertices[vizinho].numero)
-                vertices_visitados.append(vertices[vizinho].numero)
 
+                vertices_visitados.append(vertices[vizinho].numero)
                 arestas_pai.append(aresta_escolhida)
                 colocar_arv(arvore, vertice_atual.numero, vertices[vizinho].numero)
                 vertices[vizinho].numero_pai = vertice_atual.numero
@@ -145,19 +156,26 @@ def buscar_em_largura(G_pgv, caminho_imagem, vertices, vertices_visitados, arest
                     window['-IMAGE2-'].update(f'{"grafo/arvore.png"}')
                     window.refresh()
                     time.sleep(sleep_t)
+
+            #Se estiver marcado
             else:
+
+                #Se estiver na fila
                 if vertices[vizinho] in fila:
                     aresta_escolhida = (vertice_atual.numero, vizinho)
                     arestas_visitadas.append(aresta_escolhida)
 
+                    #Se tiver o mesmo pai será feito uma aresta irmão
                     if (vertice_atual.numero_pai == vertices[vizinho].numero_pai):
                         arestas_irmao.append(aresta_escolhida)
                         colocar_arv(arvore, vertice_atual.numero, vertices[vizinho].numero, "DarkBlue")
 
+                    #Se tiver o mesmo nível será feito uma aresta primos
                     elif (vertice_atual.nivel_na_arvore == vertices[vizinho].nivel_na_arvore):
                         arestas_primo.append(aresta_escolhida)
                         colocar_arv(arvore, vertice_atual.numero, vertices[vizinho].numero, "orange")
 
+                    #Em último caso será feito uma aresta tio
                     else:
                         arestas_tio.append(aresta_escolhida)
                         colocar_arv(arvore, vertice_atual.numero, vertices[vizinho].numero, "DarkMagenta")
@@ -190,11 +208,13 @@ def buscar_em_largura(G_pgv, caminho_imagem, vertices, vertices_visitados, arest
         window["-IMAGE2-"].update(filename="grafo/arvore.png")
         window.refresh()
 
+    #Verifica se é conexo retornando os vértices não encontrados ainda
     G_conn = isConnect(vertices_visitados, num_vertices, componentes)
 
     if not G_conn:
         return False
     else:
+        #Realiza a busca novamente começando agora pelo vértice da componente desconexa
         buscar_em_largura(G_pgv, caminho_imagem, vertices, vertices_visitados, arestas_irmao, arestas_primo,
                           arestas_pai, arestas_tio, window, G_conn[0], arvore, componentes, sleep_t)
         return True

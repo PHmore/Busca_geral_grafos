@@ -21,11 +21,11 @@ python main.py
 
 ## Requisitos
 
-Instalação da biblioteca PySimpleGUI para execução da interface gráfica, instalação da biblioteca PyGraphViz para a manipulação da imagem do grafo, instalação da biblioteca matplotlib para salvar a imagem do grafo, a biblioteca time para diminuir a velocidade .
+Instalação da biblioteca PySimpleGUI para execução da interface gráfica, instalação da biblioteca PyGraphViz para a manipulação da imagem do grafo, instalação da biblioteca matplotlib para salvar a imagem do grafo, a biblioteca time para diminuir a velocidade de execução do código.
 
 ## Configuração
 
-[Necessário um arquivo de texto contendo as matrizes as geram o grafo]
+[Necessário um arquivo de texto contendo as matrizes as quais geram o grafo]
 
 
 ## Autores

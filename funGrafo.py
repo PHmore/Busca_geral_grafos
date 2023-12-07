@@ -63,7 +63,8 @@ def vert_inicial(grafo):
         return 0
 
 
-# Função para verificar se dois vértices estão conectados no grafo
+# Função verifica se os vértices encontrados são todos os vértices do grafo
+# Se não forem retorna os vértices que não forma encontrados pela busca
 def isConnect(vertices_encontrados, vertices_totais, componente=[]):
     vertices_encontrados = set(vertices_encontrados)
     vertices_totais = set(vertices_totais)
@@ -91,6 +92,7 @@ def isBipart(vertices, arestas_irmao, arestas_primo, arvore=None, G_pgv=None):
                 pgv_node.attr['color'] = color
                 arvore.draw('grafo/arvore.png')
 
+    #Se houver aresta irmão ou primo não é bipartido
     if arestas_irmao or arestas_primo:
         arestas_special = list()
         ciclo_impar_arestas = list()
