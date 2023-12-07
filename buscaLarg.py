@@ -1,28 +1,25 @@
+# Importa as bibliotecas necessárias
 import time
 from collections import deque
 import pygraphviz as pgv
 from funGrafo import *
-import os
 
-# ! Tentar fazer com que sair no meio do programa não mostre a tela de morte
 
-# Tlvz seja possível retirar a repetição de definição de listas
-# Visto que no python as alterações em listas dentro de funções são globais
-
+# Função para zerar as cores do grafo, deixando todos os vértices e arestas cinza e pretas, respectivamente
 def zerar_cor_grafo(G_pgv):
-    
     for node in G_pgv.nodes():
         node.attr['color'] = 'gray'
 
     for edge in G_pgv.edges():
         edge.attr['color'] = 'black'
-    
+
     G_pgv.draw('grafo/grafo.png')
 
-def atualizar_grafo(G_pgv = None, no_atual=None, no_visitados=None, arestas_visitadas=None,
-                          aresta_pintada=None):
-    
-    def draw_edges(edges, color, width, G = G_pgv):
+
+# Função para atualizar a visualização do grafo, marcando vértices e arestas com cores específicas
+def atualizar_grafo(G_pgv=None, no_atual=None, no_visitados=None, arestas_visitadas=None,
+                    aresta_pintada=None):
+    def draw_edges(edges, color, width, G=G_pgv):
         for edge in edges:
             pgv_edge = G.get_edge(*edge)
             pgv_edge.attr['color'] = color
@@ -55,28 +52,30 @@ def atualizar_grafo(G_pgv = None, no_atual=None, no_visitados=None, arestas_visi
             draw_nodes([no_atual], '#63FF5C')
     except:
         pass
-        
+
     G_pgv.draw('grafo/grafo.png')
 
     #return G_pgv
 
+# Função para colocar uma aresta na árvore de busca em largura
 def colocar_arv(arvore, pai, filho, cor="black"):
     if arvore is not None:
-        if pai == None:
+        if pai is None:
             arvore.add_node(filho)
-        
+
         elif str(pai) in arvore.nodes() and str(filho) in arvore.nodes():
-            arvore.add_edge(pai, filho, color=cor, constraint = False)
+            arvore.add_edge(pai, filho, color=cor, constraint=False)
         else:
             arvore.add_node(pai)
             arvore.add_node(filho)
             arvore.add_edge(pai, filho, color=cor)
-    
+
         arvore.graph_attr.update(rankdir='TB')
-        arvore.node_attr.update(style='filled', shape='circle', width='0.3', height='0.3', fixedsize='True', color='lightblue')
+        arvore.node_attr.update(style='filled', shape='circle', width='0.3', height='0.3', fixedsize='True',
+                                color='lightblue')
         arvore.edge_attr.update(penwidth='3.0')
         arvore.layout(prog='dot')
-        
+
         arvore.draw('grafo/arvore.png')
 
         return arvore
@@ -84,20 +83,23 @@ def colocar_arv(arvore, pai, filho, cor="black"):
         return None
 
 
-def buscar_em_largura(G_pgv,caminho_imagem,vertices, vertices_visitados, arestas_irmao,arestas_primo,arestas_pai,arestas_tio,window = None, vertice_inicial=0,arvore = None,componentes = [] ):
+# Função para realizar a busca em largura em um grafo e visualizar a árvore resultante
+def buscar_em_largura(G_pgv, caminho_imagem, vertices, vertices_visitados, arestas_irmao, arestas_primo,
+                      arestas_pai, arestas_tio, window=None, vertice_inicial=0, arvore=None, componentes=[],
+                      sleep_t=0.5):
     arestas = []
     arestas_visitadas = list()
 
     arestas = list(G_pgv.edges())
-    arestas = [(int(aresta[0]), int(aresta[1])) for aresta in arestas ]
+    arestas = [(int(aresta[0]), int(aresta[1])) for aresta in arestas]
 
     num_vertices = list()
     for v in range(len(G_pgv.nodes())):
         num_vertices.append(v)
         if len(vertices) <= v:
-            novo_no = Vertice(v,-1)
+            novo_no = Vertice(v, -1)
             vertices.append(novo_no)
-            
+
     for v in vertices:
         for n in arestas:
             if v.numero in n:
@@ -109,20 +111,18 @@ def buscar_em_largura(G_pgv,caminho_imagem,vertices, vertices_visitados, arestas
 
     fila = deque([vertices[vertice_inicial]])
     vertices[vertice_inicial].marcado = True
-    vertices[vertice_inicial].nivel_na_arvore = 1 
+    vertices[vertice_inicial].nivel_na_arvore = 1
     if window:
         vertices_enfileirados.append(vertices[vertice_inicial].numero)
     vertices_visitados.append(vertices[vertice_inicial].numero)
-    
+
     colocar_arv(arvore, None, vertice_inicial)
     vertices[vertice_inicial].numero_pai = None
-    
-    while fila:
 
+    while fila:
         vertice_atual = fila.popleft()
 
         for vizinho in vertice_atual.adjacencia:
-
             if not vertices[vizinho].marcado:
                 aresta_escolhida = (vertice_atual.numero, vizinho)
                 arestas_visitadas.append(aresta_escolhida)
@@ -139,12 +139,12 @@ def buscar_em_largura(G_pgv,caminho_imagem,vertices, vertices_visitados, arestas
 
                 if window:
                     atualizar_grafo(G_pgv, vertice_atual.numero, vertices_visitados,
-                                        arestas_visitadas, aresta_escolhida)  # Gera imagem
+                                    arestas_visitadas, aresta_escolhida)
                     window["-TEXT-"].update(f'Fila: {vertices_enfileirados}')
                     window['-IMAGE-'].update(f'{caminho_imagem}')
                     window['-IMAGE2-'].update(f'{"grafo/arvore.png"}')
                     window.refresh()
-                    time.sleep(0.5)
+                    time.sleep(sleep_t)
             else:
                 if vertices[vizinho] in fila:
                     aresta_escolhida = (vertice_atual.numero, vizinho)
@@ -161,22 +161,22 @@ def buscar_em_largura(G_pgv,caminho_imagem,vertices, vertices_visitados, arestas
                     else:
                         arestas_tio.append(aresta_escolhida)
                         colocar_arv(arvore, vertice_atual.numero, vertices[vizinho].numero, "DarkMagenta")
-                    
+
                     if window:
                         atualizar_grafo(G_pgv, vertice_atual.numero, vertices_visitados,
-                                            arestas_visitadas, aresta_escolhida)
+                                        arestas_visitadas, aresta_escolhida)
                         window["-TEXT-"].update(f'Fila: {vertices_enfileirados}')
                         window['-IMAGE-'].update(f'{caminho_imagem}')
                         window['-IMAGE2-'].update(f'{"grafo/arvore.png"}')
                         window.refresh()
-                        time.sleep(0.5)
+                        time.sleep(sleep_t)
                 elif window:
                     atualizar_grafo(G_pgv, vertice_atual.numero, vertices_visitados,
-                                        arestas_visitadas)
+                                    arestas_visitadas)
                     window['-IMAGE-'].update(f'{caminho_imagem}')
                     window["-IMAGE2-"].update(filename="grafo/arvore.png")
                     window.refresh()
-                    time.sleep(0.5)
+                    time.sleep(sleep_t)
 
         if window:
             vertices_enfileirados.pop(0)
@@ -184,68 +184,67 @@ def buscar_em_largura(G_pgv,caminho_imagem,vertices, vertices_visitados, arestas
 
     if window:
         atualizar_grafo(G_pgv, vertice_atual.numero, vertices_visitados,
-                            arestas_visitadas)
+                        arestas_visitadas)
         window["-TEXT-"].update(f'Fila: {vertices_enfileirados}')
         window['-IMAGE-'].update(f'{caminho_imagem}')
         window["-IMAGE2-"].update(filename="grafo/arvore.png")
         window.refresh()
-        
-    G_conn = isConnect(vertices_visitados,num_vertices,componentes)
-    
-    if (not G_conn):
+
+    G_conn = isConnect(vertices_visitados, num_vertices, componentes)
+
+    if not G_conn:
         return False
     else:
-        
-        buscar_em_largura( G_pgv,caminho_imagem, vertices,vertices_visitados,arestas_irmao,arestas_primo,
-                          arestas_pai,arestas_tio,window, G_conn[0], arvore,componentes)
+        buscar_em_largura(G_pgv, caminho_imagem, vertices, vertices_visitados, arestas_irmao, arestas_primo,
+                          arestas_pai, arestas_tio, window, G_conn[0], arvore, componentes, sleep_t)
         return True
 
-    
-        
-        
-        
 
-# Mudar a direção dos dados do grafo para sua horizontal, 
-# pois os grafos tendem a ser desenhados verticalmente
-# Ocupando grande parte da janela
+# Função para criar a interface gráfica da busca em largura
 def interface_buscaLarg(G_pgv, matriz_adjacencia):
     global vertices_enfileirados
 
+    # Caminho para a imagem do grafo
     caminho_imagem = "grafo/grafo.png"
     sg.theme('Reddit')
 
+    # Zera as cores do grafo e cria uma árvore vazia
     zerar_cor_grafo(G_pgv)
     arvore = pgv.AGraph(strict=True)
     arvore.layout(prog='dot')
     arvore.draw('grafo/arvore.png')
 
-    arestas_primo = list() 
+    # Listas para armazenar informações sobre as arestas
+    arestas_primo = list()
     arestas_tio = list()
     arestas_pai = list()
     arestas_irmao = list()
 
+    # Listas para armazenar informações sobre os vértices
     vertices = list()
     vertices_enfileirados = list()
-    vertices_visitados = list ()
+    vertices_visitados = list()
+
+    # Layout da interface gráfica
     layout = [
         [
             sg.Column([
-                [sg.Image(filename=caminho_imagem, key="-IMAGE-")],
-                [sg.Text(f'Fila: {vertices_enfileirados}', key="-TEXT-", font=("Ubuntu", 20))],
-                [sg.Text('Legenda de vértices:')],
-                [
-                    sg.Column([
+                        [sg.Text('Legenda de vértices:')],
                         [sg.Text('', background_color='green'), sg.Text('Em processo de visita ', pad=(0, 0))],
                         [sg.Text('', background_color='skyblue'), sg.Text('Marcado ', pad=(0, 0))],
-                        [sg.Text('', background_color='red'), sg.Text('Totalmente explorados ', pad=(0, 0))]
-                    ]),
-                    sg.Column([
+                        [sg.Text('', background_color='red'), sg.Text('Totalmente explorados ', pad=(0, 0))],
+                        [sg.Text(''), sg.Text(''), sg.Text(''), sg.Text('')],
                         [sg.Text('Legenda de arestas:')],
                         [sg.Text('', background_color='green'), sg.Text('Em processo de visita ', pad=(0, 0))],
                         [sg.Text('', background_color='red'), sg.Text('Visitadas ', pad=(0, 0))]
-                    ])
-                ]
+                    ],vertical_alignment='center'),
+
+            sg.Column([
+                [sg.Image(filename=caminho_imagem, key="-IMAGE-")],
+                [sg.Text(f'Fila: {vertices_enfileirados}', key="-TEXT-", font=("Ubuntu", 20))]
+                
             ]),
+
             sg.VSeparator(),
             sg.Column([
                 [sg.Text(f'Arvore', font=("Ubuntu", 20))],
@@ -256,8 +255,7 @@ def interface_buscaLarg(G_pgv, matriz_adjacencia):
                 [sg.Text('', background_color='DarkMagenta'), sg.Text('Tio ', pad=(0, 0))],
                 [sg.Text('', background_color='orange'), sg.Text('Primo ', pad=(0, 0))],
                 [sg.Text(''), sg.Text('')]
-                #Colocar mensagem embaixo da arvore falando se o grafo é conexo ou não
-                
+
             ], vertical_alignment='center'),
             sg.Column([
                 [sg.Image(filename="grafo/arvore.png", key="-IMAGE2-")]
@@ -265,32 +263,31 @@ def interface_buscaLarg(G_pgv, matriz_adjacencia):
         ],
         [sg.HSeparator()],
         [
-            sg.Push(), 
-            sg.Column([[sg.Button('Mostrar bipartição',visible = False)]], key='-COL-BPART-'), 
+            sg.Push(),
+            sg.Column([[sg.Button('Mostrar bipartição', visible=False)]], key='-COL-BPART-'),
             sg.Button('Busca'),
-            sg.Button('Sair'), 
+            sg.Button('Sair'),
             sg.Push()
         ]
-        ]   
+    ]
 
-
+    # Criação da janela
     window = sg.Window('Busca em Largura', layout, resizable=True, finalize=True, auto_size_buttons=True,
                        auto_size_text=True)
 
     while True:
         event,values = window.read()
 
+        # Verifica se a janela foi fechada ou o botão 'Sair' foi pressionado
         if event == sg.WIN_CLOSED or event == 'Sair':
             zerar_cor_grafo(G_pgv)
             break
             
 
-        if event == 'Read':
-            window['-IN-'].update('')
-            window.Refresh()
-
+        # Verifica se o botão 'Busca' foi pressionado
         if event == 'Busca':
 
+            # Limpa as listas e obtém o vértice inicial
             arestas_primo.clear()
             arestas_tio.clear()
             arestas_pai.clear()
@@ -300,25 +297,24 @@ def interface_buscaLarg(G_pgv, matriz_adjacencia):
             vertices_visitados.clear()
             vertice_inicial = vert_inicial(matriz_adjacencia)
 
+            # Verifica se um vértice inicial foi selecionado
             if vertice_inicial != -1:
                 arvore.clear()
                 zerar_cor_grafo(G_pgv)
-                buscar_em_largura( G_pgv,caminho_imagem ,vertices, vertices_visitados,
-                                arestas_irmao,arestas_primo, arestas_pai,arestas_tio,window, vertice_inicial, arvore)
+                # Realiza a busca em largura
+                buscar_em_largura(G_pgv, caminho_imagem, vertices, vertices_visitados,
+                                  arestas_irmao, arestas_primo, arestas_pai, arestas_tio, window, vertice_inicial, arvore, [], 1.0)
+                # Torna visível o botão 'Mostrar bipartição'
                 window['-COL-BPART-'].update(visible=True)
                 window['Mostrar bipartição'].update(visible=True)
 
-            
-            print("\nARESTAS PAI: ",arestas_pai)
-            print("ARESTAS TIO: ",arestas_tio)
-            print("ARESTAS IRMÃO: ",arestas_irmao)
-            print("ARESTAS PRIMO: ",arestas_primo,"\n")
-
-
+        # Exibe informações sobre as arestas
         if event == 'Mostrar bipartição':
             isBipart(vertices, arestas_irmao, arestas_primo, arvore, G_pgv)
             arvore.clear()
             window["-IMAGE2-"].update(filename="grafo/arvore.png")
             window["-IMAGE-"].update(filename="grafo/grafo.png")
+
     window.close()
     return
+

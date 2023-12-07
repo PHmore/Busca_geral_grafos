@@ -1,4 +1,5 @@
 # Busca_largura_grafos
+
 Implementação da busca em largura em grafos feito em python
 
 # Busca em largura
@@ -20,7 +21,7 @@ python main.py
 
 ## Requisitos
 
-Instalação da biblioteca PySimpleGUI para execução da interface gráfica, instalação da biblioteca networkx para a manipulação da imagem do grafo, instalação da biblioteca matplotlib para salvar a imagem do grafo.
+Instalação da biblioteca PySimpleGUI para execução da interface gráfica, instalação da biblioteca PyGraphViz para a manipulação da imagem do grafo, instalação da biblioteca matplotlib para salvar a imagem do grafo, a biblioteca time para diminuir a velocidade .
 
 ## Configuração
 
