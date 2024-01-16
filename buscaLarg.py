@@ -247,6 +247,10 @@ def interface_buscaLarg(G_pgv, matriz_adjacencia):
                 window['-COL-BPART-'].update(visible=True)
                 window['Mostrar bipartição'].update(visible=True)
 
+                print("\nArestas pai: ",arestas_pai,"\nArestas irmão: ",arestas_irmao,
+                  "\nArestas primo: ",arestas_primo,"\nArestas tio: ",arestas_tio,"\n")
+
+
         # Exibe informações sobre as arestas
         if event == 'Mostrar bipartição':
             isBipart(vertices, arestas_irmao, arestas_primo, arvore, G_pgv)
