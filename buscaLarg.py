@@ -4,87 +4,6 @@ from collections import deque
 import pygraphviz as pgv
 from funGrafo import *
 
-
-# Função para zerar as cores do grafo, deixando todos os vértices e arestas cinza e pretas, respectivamente
-def zerar_cor_grafo(G_pgv):
-    for node in G_pgv.nodes():
-        node.attr['color'] = 'gray'
-
-    for edge in G_pgv.edges():
-        edge.attr['color'] = 'black'
-
-    G_pgv.draw('grafo/grafo.png')
-
-
-# Função para atualizar a visualização do grafo, marcando vértices e arestas com cores específicas
-def atualizar_grafo(G_pgv=None, no_atual=None, no_visitados=None, arestas_visitadas=None,
-                    aresta_pintada=None):
-    def draw_edges(edges, color, width, G=G_pgv):
-        for edge in edges:
-            pgv_edge = G.get_edge(*edge)
-            pgv_edge.attr['color'] = color
-            pgv_edge.attr['penwidth'] = width
-
-    if arestas_visitadas:
-        draw_edges(arestas_visitadas, 'red', 3.0)
-
-    if aresta_pintada:
-        draw_edges([aresta_pintada], 'green', 3.0)
-
-    def draw_nodes(nodes, color, G = G_pgv):
-        for node in nodes:
-            pgv_node = G.get_node(node)
-            pgv_node.attr['color'] = color
-
-    try:
-        if no_visitados is not None and vertices_enfileirados is not None:
-            #tira os nós visitados dos nós enfirelados para que sejam coloridos de forma diferente
-            resultado = list(set(no_visitados) - set(vertices_enfileirados))
-        else:
-            resultado = None
-
-        if resultado:
-            draw_nodes(resultado, '#FF2E2E')
-
-        if vertices_enfileirados is not None:
-            draw_nodes(vertices_enfileirados, 'skyblue')
-
-        if no_atual is not None:
-            draw_nodes([no_atual], '#63FF5C')
-    except:
-        pass
-
-    G_pgv.draw('grafo/grafo.png')
-
-    #return G_pgv
-
-# Função para colocar uma aresta na árvore de busca em largura
-def colocar_arv(arvore, pai, filho, cor="black"):
-    if arvore is not None:
-        if pai is None:
-            arvore.add_node(filho)
-
-        elif str(pai) in arvore.nodes() and str(filho) in arvore.nodes():
-            #Se o pai e o filho estiver na árvore cria uma aresta especial a qual não influência no layout
-            arvore.add_edge(pai, filho, color=cor, constraint=False)
-        else:
-            arvore.add_node(pai)
-            arvore.add_node(filho)
-            arvore.add_edge(pai, filho, color=cor)
-
-        arvore.graph_attr.update(rankdir='TB')
-        arvore.node_attr.update(style='filled', shape='circle', width='0.3', height='0.3', fixedsize='True',
-                                color='lightblue')
-        arvore.edge_attr.update(penwidth='3.0')
-        arvore.layout(prog='dot')
-
-        arvore.draw('grafo/arvore.png')
-
-        return arvore
-    else:
-        return None
-
-
 # Função para realizar a busca em largura em um grafo e visualizar a árvore resultante
 def buscar_em_largura(G_pgv, caminho_imagem, vertices, vertices_visitados, arestas_irmao, arestas_primo,
                       arestas_pai, arestas_tio, window=None, vertice_inicial=0, arvore=None, componentes=[],
@@ -202,7 +121,7 @@ def buscar_em_largura(G_pgv, caminho_imagem, vertices, vertices_visitados, arest
 
     if window:
         atualizar_grafo(G_pgv, vertice_atual.numero, vertices_visitados,
-                        arestas_visitadas)
+                        arestas_visitadas,None,vertices_enfileirados)
         window["-TEXT-"].update(f'Fila: {vertices_enfileirados}')
         window['-IMAGE-'].update(f'{caminho_imagem}')
         window["-IMAGE2-"].update(filename="grafo/arvore.png")
@@ -337,4 +256,3 @@ def interface_buscaLarg(G_pgv, matriz_adjacencia):
 
     window.close()
     return
-
